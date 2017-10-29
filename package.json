@@ -2,9 +2,10 @@
   "name": "gapi-to-graphql",
   "author": "rlancer",
   "license": "MIT",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Converts any Google Data API to GraphQL",
   "main": "dist/index.js",
+  "repository": "https://github.com/rlancer/gapi-to-graphql",
   "email": "files.robert.lancer@gmail.com",
   "scripts": {
     "precommit": "npm run build && lint-staged",
@@ -23,12 +24,7 @@
   },
   "dependencies": {
     "axios": "^0.17.0",
-    "drive-graphql-api": "^1.0.1",
-    "express": "^4.16.2",
-    "express-graphql": "^0.6.11",
-    "google-auth-library": "^0.11.0",
-    "googleapis": "^22.2.0",
-    "graphql": "^0.11.7"
+    "babel-runtime": "^6.26.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -52,11 +48,13 @@
     "presets": [
       "stage-0",
       [
-
         "env",
         {
           "targets": {
-            "browsers": ["last 2 versions", "safari >= 7"]
+            "browsers": [
+              "last 2 versions",
+              "safari >= 7"
+            ]
           }
         }
       ]
