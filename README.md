@@ -9,7 +9,6 @@ Converts any Google Data API to a GraphQL API via the [Google API Discovery Serv
 # npm users
 npm i gapi-to-graphql --save
 
-
 # yarn users 
 yarn add gapi-to-graphql 
 ``` 
