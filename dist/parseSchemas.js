@@ -44,7 +44,7 @@ exports.default = function (schemas, graphQLModule) {
 
 
           if (additionalProperties && additionalProperties.$ref) {
-            console.log('weirdddd');
+            // strange description in YouTube API, ignoring it for now
             return null;
           }
 

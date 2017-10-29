@@ -19,7 +19,7 @@ export default (schemas, graphQLModule) => {
           const {type, description, properties, $ref, format, additionalProperties} = propertyDetail
 
           if (additionalProperties && additionalProperties.$ref) {
-            console.log('weirdddd')
+            // strange description in YouTube API, ignoring it for now
             return null
           }
 
