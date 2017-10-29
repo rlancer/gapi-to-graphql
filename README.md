@@ -6,10 +6,11 @@ Converts any Google Data API to a GraphQL API via the [Google API Discovery Serv
 
 ```bash
 
+# npm users
 npm i gapi-to-graphql --save
 
-or 
 
+# yarn users 
 yarn add gapi-to-graphql 
 ``` 
 
