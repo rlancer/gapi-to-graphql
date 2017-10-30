@@ -244,5 +244,5 @@ console.log('Listing on port ', port)
 ## Contributors 
 
 Pull requests welcome!
-Join project on Collaborizm 
+Join the [project on Collaborizm](https://www.collaborizm.com/project/Skkk3bBA-)
 
