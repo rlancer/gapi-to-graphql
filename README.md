@@ -18,7 +18,7 @@ import gql from 'graphql'
 import graphqlHTTP from 'express-graphql'
 import express from 'express'
 import gapiToGraphQL from 'gapi-to-graphql'
-// bring your own api descriptor
+// Use any of the APIs included under the google_apis/ folder, or bring your own API descriptor 
 import YouTubeAPI from 'gapi-to-graphql/google_apis/youtube-v3'
 
 const app = express()
