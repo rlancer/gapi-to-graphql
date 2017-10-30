@@ -22,6 +22,8 @@ const downloadAllAPIs = async () => {
       ws.end()
     })
 
+    console.log('Available APIs' , data.items.map(({name, id, version})=>`|${name} | ${version} | ${id.replace(":", "-").replace('.', '~')} | `).join('\n'))
+
 
   }
   catch (err) {
