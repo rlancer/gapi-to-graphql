@@ -12,7 +12,8 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     return keyMap(parameters, (parameter, parameterDetail) => {
       const {description, required, type} = parameterDetail
       return {type: GraphQLString, description}
-    })
+    }, key=>key.replace("$.",'dollardot')
+      )
   }
 
   const mapMethod = (methodName, methodValue) => {
@@ -70,7 +71,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     return {
       [`${name}${upperFirst(version)}`]: {
         type: new GraphQLObjectType({
-          name: upperFirst(name),
+          name,
           description,
           fields: mapResources(resources)
         }),

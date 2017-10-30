@@ -54,6 +54,8 @@ exports.default = function (_ref) {
           type = parameterDetail.type;
 
       return { type: GraphQLString, description: description };
+    }, function (key) {
+      return key.replace("$.", 'dollardot');
     });
   };
 
@@ -143,7 +145,7 @@ exports.default = function (_ref) {
 
     return (0, _defineProperty3.default)({}, '' + name + (0, _utils.upperFirst)(version), {
       type: new GraphQLObjectType({
-        name: (0, _utils.upperFirst)(name),
+        name: name,
         description: description,
         fields: mapResources(resources)
       }),
