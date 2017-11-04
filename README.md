@@ -4,7 +4,7 @@ Converts any Google Data API to a GraphQL API via the [Google API Discovery Serv
 
 ## Included APIs 
 
-(Included APIs)[/docs/GoogleAPIs.md]
+[Included APIs](/docs/GoogleAPIs.md)
 
 ## Usage
 
