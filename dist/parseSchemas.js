@@ -35,6 +35,9 @@ exports.default = function (schemas, graphQLModule) {
       fields: function fields() {
 
         var rFields = (0, _utils.keyMap)(properties, function (propertyName, propertyDetail) {
+
+          if (propertyName === 'bidderLocation') console.log('bidder detai;s', propertyDetail);
+
           var type = propertyDetail.type,
               description = propertyDetail.description,
               properties = propertyDetail.properties,
@@ -66,7 +69,8 @@ exports.default = function (schemas, graphQLModule) {
                   var items = propertyDetail.items;
                   var enumItems = items.enum,
                       _$ref = items.$ref,
-                      _type = items.type;
+                      _type = items.type,
+                      _properties = items.properties;
 
                   if (enumItems) {
 
@@ -81,6 +85,8 @@ exports.default = function (schemas, graphQLModule) {
                     });
                   } else if (_type === 'string') {
                     return new GraphQLList(GraphQLString);
+                  } else if (_type === 'object') {
+                    console.log('properties of array item', _properties);
                   } else if (_$ref) {
 
                     return new GraphQLList(types[_$ref]);

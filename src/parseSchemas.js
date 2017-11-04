@@ -8,6 +8,7 @@ export default (schemas, graphQLModule) => {
 
   const parseProperties = ({name, description, properties}) => {
 
+
     return new GraphQLObjectType({
       name,
       description,
@@ -15,6 +16,8 @@ export default (schemas, graphQLModule) => {
 
         const rFields = keyMap(properties, (propertyName, propertyDetail) => {
 
+          if (propertyName === 'bidderLocation')
+            console.log('bidder detai;s', propertyDetail)
 
           const {type, description, properties, $ref, format, additionalProperties} = propertyDetail
 
@@ -40,8 +43,9 @@ export default (schemas, graphQLModule) => {
                 break
               case 'array': {
 
+
                 const {items} = propertyDetail
-                const {enum: enumItems, $ref, type} = items
+                const {enum: enumItems, $ref, type, properties} = items
                 if (enumItems) {
 
                   const values = {}
@@ -56,6 +60,9 @@ export default (schemas, graphQLModule) => {
                 }
                 else if (type === 'string') {
                   return new GraphQLList(GraphQLString)
+                }
+                else if(type === 'object') {
+                  console.log('properties of array item', properties)
                 }
                 else if ($ref) {
 

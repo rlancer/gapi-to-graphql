@@ -10,10 +10,10 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
   const mapParametersToArguments = (parameters) => {
     return keyMap(parameters, (parameter, parameterDetail) => {
-      const {description, required, type} = parameterDetail
-      return {type: GraphQLString, description}
-    }, key=>key.replace("$.",'dollardot')
-      )
+        const {description, required, type} = parameterDetail
+        return {type: GraphQLString, description}
+      }, key => key.replace("$.", 'dollardot')
+    )
   }
 
   const mapMethod = (methodName, methodValue) => {
@@ -68,12 +68,18 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
     const {name, id, description, parameters, version, resources, baseUrl, schemas} = apiJson
 
+    const fields = mapResources(resources)
+
+    if (Object.keys(fields).length === 0) {
+      throw `No fields for API ${id}`
+    }
+
     return {
-      [`${name}${upperFirst(version)}`]: {
+      [`${(name + upperFirst(version)).replace('.', '').replace(':', '')}`]: {
         type: new GraphQLObjectType({
           name,
           description,
-          fields: mapResources(resources)
+          fields
         }),
         args: mapParametersToArguments(parameters),
         resolve: (_, args) => ({rootArgs: args, rootDefinitions: parameters, baseUrl})

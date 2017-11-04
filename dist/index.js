@@ -143,11 +143,17 @@ exports.default = function (_ref) {
         schemas = apiJson.schemas;
 
 
-    return (0, _defineProperty3.default)({}, '' + name + (0, _utils.upperFirst)(version), {
+    var fields = mapResources(resources);
+
+    if ((0, _keys2.default)(fields).length === 0) {
+      throw 'No fields for API ' + id;
+    }
+
+    return (0, _defineProperty3.default)({}, '' + (name + (0, _utils.upperFirst)(version)).replace('.', '').replace(':', ''), {
       type: new GraphQLObjectType({
         name: name,
         description: description,
-        fields: mapResources(resources)
+        fields: fields
       }),
       args: mapParametersToArguments(parameters),
       resolve: function resolve(_, args) {
