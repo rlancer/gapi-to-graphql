@@ -120,6 +120,7 @@ exports.default = function (_ref) {
 
       if ((0, _keys2.default)(fields || {}).length === 0) return null;
 
+      console.log('resource', resource);
       return {
         type: new GraphQLObjectType({
           name: resource,

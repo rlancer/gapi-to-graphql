@@ -4,7 +4,7 @@ export default (schemas, graphQLModule) => {
 
   const {GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLInt, GraphQLList, GraphQLEnumType} = graphQLModule
   const types = {}
-
+  const existingNames = {}
   // sometimes arrays have anonymous types and need to make sure they have unique names
   const arrayItemTypesCount = {}
 
@@ -56,8 +56,17 @@ export default (schemas, graphQLModule) => {
   const parseProperties = ({name, description, properties}) => {
 
 
+    if (existingNames[name] ) {
+    //  console.warn('Type with ' + name + ' exists')
+      ++existingNames[name]
+    }
+    else {
+      // console.log(name + ' is free', existingNames[name])
+      existingNames[name] = 1
+    }
+
     return new GraphQLObjectType({
-      name,
+      name: name + (existingNames[name] > 1 ? existingNames[name] : ''),
       description,
       fields: () => {
 
@@ -130,13 +139,22 @@ export default (schemas, graphQLModule) => {
 
         // console.dir(schema)
         const {id, type, properties, description} = schema
+
+        if (id === 'error') {
+          console.log(schema)
+        }
+
+        console.log({id})
+        if (types [id]) {
+          console.warn('Type', id, schema, 'exists')
+        }
+
         if (type === 'object') {
           types [id] = parseProperties({name: id, description, properties})
         }
         else if (type === 'array') {
-          console.log(schema)
 
-          types [schema.id] = handleArray({typeName: 'Root', propertyName: id, propertyDetail: schema})
+          types [id] = handleArray({typeName: 'Root', propertyName: id, propertyDetail: schema})
 
 
         }

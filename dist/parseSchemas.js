@@ -22,7 +22,7 @@ exports.default = function (schemas, graphQLModule) {
       GraphQLEnumType = graphQLModule.GraphQLEnumType;
 
   var types = {};
-
+  var existingNames = {};
   // sometimes arrays have anonymous types and need to make sure they have unique names
   var arrayItemTypesCount = {};
 
@@ -75,8 +75,16 @@ exports.default = function (schemas, graphQLModule) {
         properties = _ref2.properties;
 
 
+    if (existingNames[name]) {
+      //  console.warn('Type with ' + name + ' exists')
+      ++existingNames[name];
+    } else {
+      // console.log(name + ' is free', existingNames[name])
+      existingNames[name] = 1;
+    }
+
     return new GraphQLObjectType({
-      name: name,
+      name: name + (existingNames[name] > 1 ? existingNames[name] : ''),
       description: description,
       fields: function fields() {
 
@@ -151,12 +159,21 @@ exports.default = function (schemas, graphQLModule) {
           properties = schema.properties,
           description = schema.description;
 
+
+      if (id === 'error') {
+        console.log(schema);
+      }
+
+      console.log({ id: id });
+      if (types[id]) {
+        console.warn('Type', id, schema, 'exists');
+      }
+
       if (type === 'object') {
         types[id] = parseProperties({ name: id, description: description, properties: properties });
       } else if (type === 'array') {
-        console.log(schema);
 
-        types[schema.id] = handleArray({ typeName: 'Root', propertyName: id, propertyDetail: schema });
+        types[id] = handleArray({ typeName: 'Root', propertyName: id, propertyDetail: schema });
       } else {
         console.log('non object type \'' + type + '\'!', schema);
       }

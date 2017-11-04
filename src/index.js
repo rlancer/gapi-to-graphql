@@ -52,6 +52,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
       if (Object.keys(fields || {} ).length === 0)
         return null
 
+      console.log('resource', resource)
       return {
         type: new GraphQLObjectType({
           name: resource,
@@ -73,6 +74,8 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     if (Object.keys(fields).length === 0) {
       throw `No fields for API ${id}`
     }
+
+
 
     return {
       [`${(name + upperFirst(version)).replace('.', '').replace(':', '')}`]: {
