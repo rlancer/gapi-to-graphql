@@ -233,6 +233,9 @@ app.listen(port)
 console.log('Listing on port ', port)
 ```
 
+## Examples 
+Using React https://github.com/rlancer/gapi-to-graphql-example-yt-react
+
 ## Limitations 
 
 * Read only (for now)
@@ -244,5 +247,5 @@ console.log('Listing on port ', port)
 ## Contributors 
 
 Pull requests welcome!
-Join project on Collaborizm 
+Join the [project on Collaborizm](https://www.collaborizm.com/project/Skkk3bBA-)
 
