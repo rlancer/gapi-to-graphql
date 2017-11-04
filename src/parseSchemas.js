@@ -8,6 +8,51 @@ export default (schemas, graphQLModule) => {
   // sometimes arrays have anonymous types and need to make sure they have unique names
   const arrayItemTypesCount = {}
 
+  const handleArray = ({typeName, propertyName, propertyDetail}) => {
+    const {items} = propertyDetail
+    const {enum: enumItems, $ref, type, properties} = items
+    if (enumItems) {
+
+      const values = {}
+      enumItems.forEach(enumItem => {
+        values[enumItem] = {value: enumItem}
+      })
+
+      return new GraphQLEnumType({
+        name: propertyName,
+        values
+      })
+    }
+    else if (type === 'string' || type === 'any') {
+      return new GraphQLList(GraphQLString)
+    }
+
+    else if (type === 'integer') {
+      return new GraphQLList(GraphQLInt)
+    }
+    else if (type === 'object') {
+
+      const arrayItemTypeName = `${typeName}${upperFirst(propertyName)}Item`
+
+      return new GraphQLList(parseProperties({
+        name: `${arrayItemTypeName}`,
+        properties
+      }))
+    }
+    else if ($ref) {
+      return new GraphQLList(types[$ref])
+    }
+    else if (type === 'array') {
+
+      return new GraphQLList(handleArray({typeName, propertyDetail: propertyDetail.items}))
+    }
+    else {
+      console.log('Unknown response ?', propertyDetail)
+    }
+
+
+  }
+
   const parseProperties = ({name, description, properties}) => {
 
 
@@ -19,9 +64,6 @@ export default (schemas, graphQLModule) => {
         const rFields = keyMap(properties, (propertyName, propertyDetail) => {
 
 
-          if (propertyName === 'rows')
-            console.log('attribute ', propertyDetail)
-
           const {type, description, properties, $ref, format, additionalProperties} = propertyDetail
 
           if (additionalProperties && additionalProperties.$ref) {
@@ -32,49 +74,6 @@ export default (schemas, graphQLModule) => {
 
           const rType = (() => {
 
-            const handleArray = ({propertyName, propertyDetail}) => {
-              const {items} = propertyDetail
-              const {enum: enumItems, $ref, type, properties} = items
-              if (enumItems) {
-
-                const values = {}
-                enumItems.forEach(enumItem => {
-                  values[enumItem] = {value: enumItem}
-                })
-
-                return new GraphQLEnumType({
-                  name: propertyName,
-                  values
-                })
-              }
-              else if (type === 'string' || type === 'any') {
-                return new GraphQLList(GraphQLString)
-              }
-
-              else if (type === 'integer') {
-                return new GraphQLList(GraphQLInt)
-              }
-              else if (type === 'object') {
-
-                const arrayItemTypeName = `${name}${upperFirst(propertyName)}Item`
-
-                return new GraphQLList(parseProperties({
-                  name: `${arrayItemTypeName}`,
-                  properties
-                }))
-              }
-              else if ($ref) {
-                return new GraphQLList(types[$ref])
-              }
-              else if (type === 'array') {
-                return new GraphQLList(handleArray({propertyDetail: propertyDetail.items}))
-              }
-              else {
-                console.log('Unknown response ?', propertyDetail)
-              }
-
-
-            }
 
             if ($ref) {
 
@@ -91,7 +90,7 @@ export default (schemas, graphQLModule) => {
                 return GraphQLString
                 break
               case 'array': {
-                return handleArray({propertyName, propertyDetail})
+                return handleArray({typeName: name, propertyName, propertyDetail})
               }
                 break
               case 'object':
@@ -134,8 +133,15 @@ export default (schemas, graphQLModule) => {
         if (type === 'object') {
           types [id] = parseProperties({name: id, description, properties})
         }
+        else if (type === 'array') {
+          console.log(schema)
+
+          types [schema.id] = handleArray({typeName: 'Root', propertyName: id, propertyDetail: schema})
+
+
+        }
         else {
-          console.log('non object!', schema)
+          console.log(`non object type '${type}'!`, schema,)
         }
 
       }
