@@ -23,6 +23,9 @@ exports.default = function (schemas, graphQLModule) {
 
   var types = {};
 
+  // sometimes arrays have anonymous types and need to make sure they have unique names
+  var arrayItemTypesCount = {};
+
   var parseProperties = function parseProperties(_ref) {
     var name = _ref.name,
         description = _ref.description,
@@ -36,7 +39,7 @@ exports.default = function (schemas, graphQLModule) {
 
         var rFields = (0, _utils.keyMap)(properties, function (propertyName, propertyDetail) {
 
-          if (propertyName === 'bidderLocation') console.log('bidder detai;s', propertyDetail);
+          if (propertyName === 'calloutStatusRate') console.log('attribute ', propertyDetail);
 
           var type = propertyDetail.type,
               description = propertyDetail.description,
@@ -83,12 +86,19 @@ exports.default = function (schemas, graphQLModule) {
                       name: propertyName,
                       values: values
                     });
-                  } else if (_type === 'string') {
+                  } else if (_type === 'string' || _type === 'any') {
                     return new GraphQLList(GraphQLString);
+                  } else if (_type === 'integer') {
+                    return new GraphQLList(GraphQLInt);
                   } else if (_type === 'object') {
-                    console.log('properties of array item', _properties);
-                  } else if (_$ref) {
 
+                    var arrayItemTypeName = '' + name + (0, _utils.upperFirst)(propertyName) + 'Item';
+
+                    return new GraphQLList(parseProperties({
+                      name: '' + arrayItemTypeName,
+                      properties: _properties
+                    }));
+                  } else if (_$ref) {
                     return new GraphQLList(types[_$ref]);
                   }
                 }

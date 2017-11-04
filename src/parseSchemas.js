@@ -5,6 +5,8 @@ export default (schemas, graphQLModule) => {
   const {GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLInt, GraphQLList, GraphQLEnumType} = graphQLModule
   const types = {}
 
+  // sometimes arrays have anonymous types and need to make sure they have unique names
+  const arrayItemTypesCount = {}
 
   const parseProperties = ({name, description, properties}) => {
 
@@ -16,8 +18,8 @@ export default (schemas, graphQLModule) => {
 
         const rFields = keyMap(properties, (propertyName, propertyDetail) => {
 
-          if (propertyName === 'bidderLocation')
-            console.log('bidder detai;s', propertyDetail)
+          if (propertyName === 'calloutStatusRate')
+            console.log('attribute ', propertyDetail)
 
           const {type, description, properties, $ref, format, additionalProperties} = propertyDetail
 
@@ -43,7 +45,6 @@ export default (schemas, graphQLModule) => {
                 break
               case 'array': {
 
-
                 const {items} = propertyDetail
                 const {enum: enumItems, $ref, type, properties} = items
                 if (enumItems) {
@@ -58,14 +59,23 @@ export default (schemas, graphQLModule) => {
                     values
                   })
                 }
-                else if (type === 'string') {
+                else if (type === 'string' || type === 'any') {
                   return new GraphQLList(GraphQLString)
                 }
-                else if(type === 'object') {
-                  console.log('properties of array item', properties)
+
+                else if (type === 'integer') {
+                  return new GraphQLList(GraphQLInt)
+                }
+                else if (type === 'object') {
+
+                  const arrayItemTypeName = `${name}${upperFirst(propertyName)}Item`
+
+                  return new GraphQLList(parseProperties({
+                    name: `${arrayItemTypeName}`,
+                    properties
+                  }))
                 }
                 else if ($ref) {
-
                   return new GraphQLList(types[$ref])
                 }
 
