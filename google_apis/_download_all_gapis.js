@@ -11,9 +11,6 @@ const downloadAllAPIs = async () => {
       url: 'https://www.googleapis.com/discovery/v1/apis'
     })
 
-    const wsList = fs.createWriteStream(`_api_list.js`)
-    wsList.write(`module.exports = ${JSON.stringify(data)};`)
-    wsList.end()
 
     data.items.forEach(async item => {
 
@@ -27,6 +24,16 @@ const downloadAllAPIs = async () => {
       ws.write(`module.exports = ${JSON.stringify(itemData)};`)
       ws.end()
     })
+
+
+    const wsList = fs.createWriteStream(`_api_list.js`)
+    wsList.write(`module.exports = ${JSON.stringify(data.items.map(({name, id, version}) => ({
+      module: idToFilename(id),
+      name,
+      id
+    })))};`)
+    wsList.end()
+
 
     console.log('Available APIs', data.items.map(({name, id, version}) => `|${name} | ${version} | require('gapi-to-graphql/google_apis/${idToFilename(id)}') |`).join('\n'))
   }
