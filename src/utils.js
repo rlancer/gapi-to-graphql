@@ -5,7 +5,7 @@ const keyMap = (literal, valueOperator, keyTransform) => {
     return null
 
   const r = {}
-  Object.keys(literal).forEach(key => {
+  keys(literal).forEach(key => {
     const value = valueOperator(key, literal[key])
 
     if (value !== null)
@@ -14,5 +14,10 @@ const keyMap = (literal, valueOperator, keyTransform) => {
   return r
 }
 
-
-export {upperFirst, keyMap}
+const keys = obj => {
+  return Object.keys(obj || {})
+}
+const values = obj => {
+  return Object.values(obj || {})
+}
+export {upperFirst, keyMap, keys, values}

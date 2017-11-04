@@ -1,6 +1,6 @@
 import makeApiRequest from './request'
 import parseSchemas from './parseSchemas'
-import {upperFirst, keyMap} from './utils'
+import {upperFirst, keyMap, keys, values} from './utils'
 
 export default ({gapiAsJsonSchema, graphQLModule}) => {
 
@@ -49,10 +49,9 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
       const fields = keyMap(resourceDetails.methods, mapMethod)
 
-      if (Object.keys(fields || {} ).length === 0)
+      if (keys(fields || {} ).length === 0)
         return null
 
-      console.log('resource', resource)
       return {
         type: new GraphQLObjectType({
           name: resource,
@@ -71,7 +70,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
     const fields = mapResources(resources)
 
-    if (Object.keys(fields).length === 0) {
+    if (keys(fields).length === 0) {
       throw `No fields for API ${id}`
     }
 

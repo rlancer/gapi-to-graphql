@@ -1,9 +1,10 @@
 import axios from 'axios'
+import {keys} from './utils'
 
 export default async ({definitions, args, baseUrl, path, httpMethod}) => {
 
   const params = {}
-  Object.keys(args).forEach(key => {
+  keys(args).forEach(key => {
       const {type, location} = definitions[key]
 
       if (location === 'query')

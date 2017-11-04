@@ -1,10 +1,28 @@
-import {upperFirst, keyMap} from './utils'
+import {upperFirst, keyMap, keys, values} from './utils'
 
 export default (schemas, graphQLModule) => {
+
 
   const {GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLInt, GraphQLList, GraphQLEnumType} = graphQLModule
   const types = {}
   const existingNames = {}
+
+
+  // renames kind of sloppy can do something where if a root type exists it say's TasksRoot instead of te second being Tasks2
+  const getUniqueName = (name, isRoot) => {
+
+
+    if (existingNames[name]) {
+      const incr = ++existingNames[name]
+      return name + incr
+    }
+    else {
+      existingNames[name] = 1
+      return name
+    }
+
+  }
+
   // sometimes arrays have anonymous types and need to make sure they have unique names
   const arrayItemTypesCount = {}
 
@@ -56,17 +74,8 @@ export default (schemas, graphQLModule) => {
   const parseProperties = ({name, description, properties}) => {
 
 
-    if (existingNames[name] ) {
-    //  console.warn('Type with ' + name + ' exists')
-      ++existingNames[name]
-    }
-    else {
-      // console.log(name + ' is free', existingNames[name])
-      existingNames[name] = 1
-    }
-
     return new GraphQLObjectType({
-      name: name + (existingNames[name] > 1 ? existingNames[name] : ''),
+      name: getUniqueName(name),
       description,
       fields: () => {
 
@@ -135,26 +144,23 @@ export default (schemas, graphQLModule) => {
   const start = () => {
 
 
-    Object.values(schemas).forEach(schema => {
+    values(schemas).forEach(schema => {
 
         // console.dir(schema)
         const {id, type, properties, description} = schema
 
-        if (id === 'error') {
-          console.log(schema)
-        }
+        const uid = getUniqueName(id, true)
 
-        console.log({id})
-        if (types [id]) {
-          console.warn('Type', id, schema, 'exists')
+        if (types [uid]) {
+          console.warn('Type', id, uid, schema, 'exists')
         }
 
         if (type === 'object') {
-          types [id] = parseProperties({name: id, description, properties})
+          types [uid] = parseProperties({name: uid, description, properties})
         }
         else if (type === 'array') {
 
-          types [id] = handleArray({typeName: 'Root', propertyName: id, propertyDetail: schema})
+          types [uid] = handleArray({typeName: 'Root', propertyName: uid, propertyDetail: schema})
 
 
         }

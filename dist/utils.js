@@ -3,7 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.keyMap = exports.upperFirst = undefined;
+exports.values = exports.keys = exports.keyMap = exports.upperFirst = undefined;
+
+var _values = require("babel-runtime/core-js/object/values");
+
+var _values2 = _interopRequireDefault(_values);
 
 var _keys = require("babel-runtime/core-js/object/keys");
 
@@ -19,7 +23,7 @@ var keyMap = function keyMap(literal, valueOperator, keyTransform) {
   if (!literal) return null;
 
   var r = {};
-  (0, _keys2.default)(literal).forEach(function (key) {
+  keys(literal).forEach(function (key) {
     var value = valueOperator(key, literal[key]);
 
     if (value !== null) r[keyTransform ? keyTransform(key) : key] = valueOperator(key, literal[key]);
@@ -27,5 +31,13 @@ var keyMap = function keyMap(literal, valueOperator, keyTransform) {
   return r;
 };
 
+var keys = function keys(obj) {
+  return (0, _keys2.default)(obj || {});
+};
+var values = function values(obj) {
+  return (0, _values2.default)(obj || {});
+};
 exports.upperFirst = upperFirst;
 exports.keyMap = keyMap;
+exports.keys = keys;
+exports.values = values;

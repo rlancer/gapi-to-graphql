@@ -8,10 +8,6 @@ var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _keys = require('babel-runtime/core-js/object/keys');
-
-var _keys2 = _interopRequireDefault(_keys);
-
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
@@ -19,6 +15,8 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 var _axios = require('axios');
 
 var _axios2 = _interopRequireDefault(_axios);
+
+var _utils = require('./utils');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38,7 +36,7 @@ exports.default = function () {
           case 0:
             params = {};
 
-            (0, _keys2.default)(args).forEach(function (key) {
+            (0, _utils.keys)(args).forEach(function (key) {
               var _definitions$key = definitions[key],
                   type = _definitions$key.type,
                   location = _definitions$key.location;

@@ -8,10 +8,6 @@ var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
-var _keys = require('babel-runtime/core-js/object/keys');
-
-var _keys2 = _interopRequireDefault(_keys);
-
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -118,9 +114,8 @@ exports.default = function (_ref) {
 
       var fields = (0, _utils.keyMap)(resourceDetails.methods, mapMethod);
 
-      if ((0, _keys2.default)(fields || {}).length === 0) return null;
+      if ((0, _utils.keys)(fields || {}).length === 0) return null;
 
-      console.log('resource', resource);
       return {
         type: new GraphQLObjectType({
           name: resource,
@@ -146,7 +141,7 @@ exports.default = function (_ref) {
 
     var fields = mapResources(resources);
 
-    if ((0, _keys2.default)(fields).length === 0) {
+    if ((0, _utils.keys)(fields).length === 0) {
       throw 'No fields for API ' + id;
     }
 

@@ -4,13 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _values = require('babel-runtime/core-js/object/values');
-
-var _values2 = _interopRequireDefault(_values);
-
 var _utils = require('./utils');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = function (schemas, graphQLModule) {
   var GraphQLObjectType = graphQLModule.GraphQLObjectType,
@@ -23,6 +17,19 @@ exports.default = function (schemas, graphQLModule) {
 
   var types = {};
   var existingNames = {};
+
+  // renames kind of sloppy can do something where if a root type exists it say's TasksRoot instead of te second being Tasks2
+  var getUniqueName = function getUniqueName(name, isRoot) {
+
+    if (existingNames[name]) {
+      var incr = ++existingNames[name];
+      return name + incr;
+    } else {
+      existingNames[name] = 1;
+      return name;
+    }
+  };
+
   // sometimes arrays have anonymous types and need to make sure they have unique names
   var arrayItemTypesCount = {};
 
@@ -38,14 +45,14 @@ exports.default = function (schemas, graphQLModule) {
 
     if (enumItems) {
 
-      var values = {};
+      var _values = {};
       enumItems.forEach(function (enumItem) {
-        values[enumItem] = { value: enumItem };
+        _values[enumItem] = { value: enumItem };
       });
 
       return new GraphQLEnumType({
         name: propertyName,
-        values: values
+        values: _values
       });
     } else if (type === 'string' || type === 'any') {
       return new GraphQLList(GraphQLString);
@@ -75,16 +82,8 @@ exports.default = function (schemas, graphQLModule) {
         properties = _ref2.properties;
 
 
-    if (existingNames[name]) {
-      //  console.warn('Type with ' + name + ' exists')
-      ++existingNames[name];
-    } else {
-      // console.log(name + ' is free', existingNames[name])
-      existingNames[name] = 1;
-    }
-
     return new GraphQLObjectType({
-      name: name + (existingNames[name] > 1 ? existingNames[name] : ''),
+      name: getUniqueName(name),
       description: description,
       fields: function fields() {
 
@@ -151,7 +150,7 @@ exports.default = function (schemas, graphQLModule) {
 
   var start = function start() {
 
-    (0, _values2.default)(schemas).forEach(function (schema) {
+    (0, _utils.values)(schemas).forEach(function (schema) {
 
       // console.dir(schema)
       var id = schema.id,
@@ -160,20 +159,17 @@ exports.default = function (schemas, graphQLModule) {
           description = schema.description;
 
 
-      if (id === 'error') {
-        console.log(schema);
-      }
+      var uid = getUniqueName(id, true);
 
-      console.log({ id: id });
-      if (types[id]) {
-        console.warn('Type', id, schema, 'exists');
+      if (types[uid]) {
+        console.warn('Type', id, uid, schema, 'exists');
       }
 
       if (type === 'object') {
-        types[id] = parseProperties({ name: id, description: description, properties: properties });
+        types[uid] = parseProperties({ name: uid, description: description, properties: properties });
       } else if (type === 'array') {
 
-        types[id] = handleArray({ typeName: 'Root', propertyName: id, propertyDetail: schema });
+        types[uid] = handleArray({ typeName: 'Root', propertyName: uid, propertyDetail: schema });
       } else {
         console.log('non object type \'' + type + '\'!', schema);
       }
