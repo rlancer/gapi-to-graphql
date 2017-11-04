@@ -118,7 +118,7 @@ exports.default = function (_ref) {
 
       var fields = (0, _utils.keyMap)(resourceDetails.methods, mapMethod);
 
-      if ((0, _keys2.default)(fields).length === 0) return null;
+      if ((0, _keys2.default)(fields || {}).length === 0) return null;
 
       return {
         type: new GraphQLObjectType({
@@ -151,7 +151,7 @@ exports.default = function (_ref) {
 
     return (0, _defineProperty3.default)({}, '' + (name + (0, _utils.upperFirst)(version)).replace('.', '').replace(':', ''), {
       type: new GraphQLObjectType({
-        name: name,
+        name: (0, _utils.upperFirst)(name),
         description: description,
         fields: fields
       }),

@@ -49,7 +49,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
       const fields = keyMap(resourceDetails.methods, mapMethod)
 
-      if (Object.keys(fields).length === 0)
+      if (Object.keys(fields || {} ).length === 0)
         return null
 
       return {
@@ -77,7 +77,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     return {
       [`${(name + upperFirst(version)).replace('.', '').replace(':', '')}`]: {
         type: new GraphQLObjectType({
-          name,
+          name: upperFirst(name),
           description,
           fields
         }),

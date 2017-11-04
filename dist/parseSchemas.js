@@ -152,7 +152,9 @@ exports.default = function (schemas, graphQLModule) {
           properties = schema.properties,
           description = schema.description;
 
-      if (type === 'object') types[id] = parseProperties({ name: id, description: description, properties: properties });else {
+      if (type === 'object') {
+        types[id] = parseProperties({ name: id, description: description, properties: properties });
+      } else {
         console.log('non object!', schema);
       }
     });

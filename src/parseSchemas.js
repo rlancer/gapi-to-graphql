@@ -129,15 +129,17 @@ export default (schemas, graphQLModule) => {
 
     Object.values(schemas).forEach(schema => {
 
-      // console.dir(schema)
-      const {id, type, properties, description} = schema
-      if (type === 'object')
-        types [id] = parseProperties({name: id, description, properties})
-      else {
-        console.log('non object!', schema)
-      }
+        // console.dir(schema)
+        const {id, type, properties, description} = schema
+        if (type === 'object') {
+          types [id] = parseProperties({name: id, description, properties})
+        }
+        else {
+          console.log('non object!', schema)
+        }
 
-    })
+      }
+    )
 
     return types
   }
