@@ -28,7 +28,7 @@ const downloadAllAPIs = async () => {
       ws.end()
     })
 
-    console.log('Available APIs', data.items.map(({name, id, version}) => `|${name} | ${version} | ${idToFilename(id)} | require('gapi-to-graphql/google_apis/${idToFilename(id)}') |`).join('\n'))
+    console.log('Available APIs', data.items.map(({name, id, version}) => `|${name} | ${version} | require('gapi-to-graphql/google_apis/${idToFilename(id)}') |`).join('\n'))
   }
   catch (err) {
     console.error(err)
