@@ -55,7 +55,7 @@ exports.default = function (_ref) {
 
       return { type: GraphQLString, description: description };
     }, function (key) {
-      return key.replace("$.", 'dollardot');
+      return key.replace("$.", 'dollardot').replace(/-/g, '');
     });
   };
 

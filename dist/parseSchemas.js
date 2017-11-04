@@ -39,7 +39,7 @@ exports.default = function (schemas, graphQLModule) {
 
         var rFields = (0, _utils.keyMap)(properties, function (propertyName, propertyDetail) {
 
-          if (propertyName === 'calloutStatusRate') console.log('attribute ', propertyDetail);
+          if (propertyName === 'rows') console.log('attribute ', propertyDetail);
 
           var type = propertyDetail.type,
               description = propertyDetail.description,
@@ -55,6 +55,48 @@ exports.default = function (schemas, graphQLModule) {
           }
 
           var rType = function () {
+
+            var handleArray = function handleArray(_ref2) {
+              var propertyName = _ref2.propertyName,
+                  propertyDetail = _ref2.propertyDetail;
+              var items = propertyDetail.items;
+              var enumItems = items.enum,
+                  $ref = items.$ref,
+                  type = items.type,
+                  properties = items.properties;
+
+              if (enumItems) {
+
+                var values = {};
+                enumItems.forEach(function (enumItem) {
+                  values[enumItem] = { value: enumItem };
+                });
+
+                return new GraphQLEnumType({
+                  name: propertyName,
+                  values: values
+                });
+              } else if (type === 'string' || type === 'any') {
+                return new GraphQLList(GraphQLString);
+              } else if (type === 'integer') {
+                return new GraphQLList(GraphQLInt);
+              } else if (type === 'object') {
+
+                var arrayItemTypeName = '' + name + (0, _utils.upperFirst)(propertyName) + 'Item';
+
+                return new GraphQLList(parseProperties({
+                  name: '' + arrayItemTypeName,
+                  properties: properties
+                }));
+              } else if ($ref) {
+                return new GraphQLList(types[$ref]);
+              } else if (type === 'array') {
+                return new GraphQLList(handleArray({ propertyDetail: propertyDetail.items }));
+              } else {
+                console.log('Unknown response ?', propertyDetail);
+              }
+            };
+
             if ($ref) {
 
               if (!types[$ref]) console.log('CAN NOT FIND REF OF TYPE ', $ref, name);
@@ -69,38 +111,7 @@ exports.default = function (schemas, graphQLModule) {
                 break;
               case 'array':
                 {
-                  var items = propertyDetail.items;
-                  var enumItems = items.enum,
-                      _$ref = items.$ref,
-                      _type = items.type,
-                      _properties = items.properties;
-
-                  if (enumItems) {
-
-                    var values = {};
-                    enumItems.forEach(function (enumItem) {
-                      values[enumItem] = { value: enumItem };
-                    });
-
-                    return new GraphQLEnumType({
-                      name: propertyName,
-                      values: values
-                    });
-                  } else if (_type === 'string' || _type === 'any') {
-                    return new GraphQLList(GraphQLString);
-                  } else if (_type === 'integer') {
-                    return new GraphQLList(GraphQLInt);
-                  } else if (_type === 'object') {
-
-                    var arrayItemTypeName = '' + name + (0, _utils.upperFirst)(propertyName) + 'Item';
-
-                    return new GraphQLList(parseProperties({
-                      name: '' + arrayItemTypeName,
-                      properties: _properties
-                    }));
-                  } else if (_$ref) {
-                    return new GraphQLList(types[_$ref]);
-                  }
+                  return handleArray({ propertyName: propertyName, propertyDetail: propertyDetail });
                 }
                 break;
               case 'object':

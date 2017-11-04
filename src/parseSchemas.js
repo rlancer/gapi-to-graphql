@@ -18,7 +18,8 @@ export default (schemas, graphQLModule) => {
 
         const rFields = keyMap(properties, (propertyName, propertyDetail) => {
 
-          if (propertyName === 'calloutStatusRate')
+
+          if (propertyName === 'rows')
             console.log('attribute ', propertyDetail)
 
           const {type, description, properties, $ref, format, additionalProperties} = propertyDetail
@@ -28,7 +29,53 @@ export default (schemas, graphQLModule) => {
             return null
           }
 
+
           const rType = (() => {
+
+            const handleArray = ({propertyName, propertyDetail}) => {
+              const {items} = propertyDetail
+              const {enum: enumItems, $ref, type, properties} = items
+              if (enumItems) {
+
+                const values = {}
+                enumItems.forEach(enumItem => {
+                  values[enumItem] = {value: enumItem}
+                })
+
+                return new GraphQLEnumType({
+                  name: propertyName,
+                  values
+                })
+              }
+              else if (type === 'string' || type === 'any') {
+                return new GraphQLList(GraphQLString)
+              }
+
+              else if (type === 'integer') {
+                return new GraphQLList(GraphQLInt)
+              }
+              else if (type === 'object') {
+
+                const arrayItemTypeName = `${name}${upperFirst(propertyName)}Item`
+
+                return new GraphQLList(parseProperties({
+                  name: `${arrayItemTypeName}`,
+                  properties
+                }))
+              }
+              else if ($ref) {
+                return new GraphQLList(types[$ref])
+              }
+              else if (type === 'array') {
+                return new GraphQLList(handleArray({propertyDetail: propertyDetail.items}))
+              }
+              else {
+                console.log('Unknown response ?', propertyDetail)
+              }
+
+
+            }
+
             if ($ref) {
 
               if (!types[$ref])
@@ -44,41 +91,7 @@ export default (schemas, graphQLModule) => {
                 return GraphQLString
                 break
               case 'array': {
-
-                const {items} = propertyDetail
-                const {enum: enumItems, $ref, type, properties} = items
-                if (enumItems) {
-
-                  const values = {}
-                  enumItems.forEach(enumItem => {
-                    values[enumItem] = {value: enumItem}
-                  })
-
-                  return new GraphQLEnumType({
-                    name: propertyName,
-                    values
-                  })
-                }
-                else if (type === 'string' || type === 'any') {
-                  return new GraphQLList(GraphQLString)
-                }
-
-                else if (type === 'integer') {
-                  return new GraphQLList(GraphQLInt)
-                }
-                else if (type === 'object') {
-
-                  const arrayItemTypeName = `${name}${upperFirst(propertyName)}Item`
-
-                  return new GraphQLList(parseProperties({
-                    name: `${arrayItemTypeName}`,
-                    properties
-                  }))
-                }
-                else if ($ref) {
-                  return new GraphQLList(types[$ref])
-                }
-
+                return handleArray({propertyName, propertyDetail})
               }
                 break
               case 'object':
@@ -115,7 +128,6 @@ export default (schemas, graphQLModule) => {
 
 
     Object.values(schemas).forEach(schema => {
-
 
       // console.dir(schema)
       const {id, type, properties, description} = schema

@@ -12,7 +12,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     return keyMap(parameters, (parameter, parameterDetail) => {
         const {description, required, type} = parameterDetail
         return {type: GraphQLString, description}
-      }, key => key.replace("$.", 'dollardot')
+      }, key => key.replace("$.", 'dollardot').replace(/-/g, '')
     )
   }
 
