@@ -12,6 +12,7 @@ export default (schemas, graphQLModule) => {
   const getUniqueName = (name, isRoot) => {
 
 
+
     if (existingNames[name]) {
       const incr = ++existingNames[name]
       return name + incr
@@ -128,7 +129,7 @@ export default (schemas, graphQLModule) => {
 
           return {type: rType, description}
 
-        })
+        }, (key => key.replace("@", "at_")))
 
         if (!rFields) {
 

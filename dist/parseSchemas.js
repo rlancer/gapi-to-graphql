@@ -136,6 +136,8 @@ exports.default = function (schemas, graphQLModule) {
           }();
 
           return { type: rType, description: description };
+        }, function (key) {
+          return key.replace("@", "at_");
         });
 
         if (!rFields) {

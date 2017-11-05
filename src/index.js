@@ -8,11 +8,13 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
   const {GraphQLString, GraphQLObjectType} = graphQLModule
 
+
+   // todo take parameters and make sure they match up after santizing name
   const mapParametersToArguments = (parameters) => {
     return keyMap(parameters, (parameter, parameterDetail) => {
         const {description, required, type} = parameterDetail
         return {type: GraphQLString, description}
-      }, key => key.replace("$.", 'dollardot').replace(/-/g, '')
+      }, key => key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '')
     )
   }
 
@@ -49,7 +51,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
       const fields = keyMap(resourceDetails.methods, mapMethod)
 
-      if (keys(fields || {} ).length === 0)
+      if (keys(fields || {}).length === 0)
         return null
 
       return {
@@ -73,7 +75,6 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     if (keys(fields).length === 0) {
       throw `No fields for API ${id}`
     }
-
 
 
     return {

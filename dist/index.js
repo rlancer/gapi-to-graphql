@@ -42,6 +42,7 @@ exports.default = function (_ref) {
   var GraphQLString = graphQLModule.GraphQLString,
       GraphQLObjectType = graphQLModule.GraphQLObjectType;
 
+  // todo take parameters and make sure they match up after santizing name
 
   var mapParametersToArguments = function mapParametersToArguments(parameters) {
     return (0, _utils.keyMap)(parameters, function (parameter, parameterDetail) {
@@ -51,7 +52,7 @@ exports.default = function (_ref) {
 
       return { type: GraphQLString, description: description };
     }, function (key) {
-      return key.replace("$.", 'dollardot').replace(/-/g, '');
+      return key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '');
     });
   };
 
