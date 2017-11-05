@@ -119,7 +119,7 @@ exports.default = function (_ref) {
 
       return {
         type: new GraphQLObjectType({
-          name: resource,
+          name: (0, _utils.upperFirst)(resource) + 'Resource',
           fields: fields
         }),
         resolve: function resolve(parent) {

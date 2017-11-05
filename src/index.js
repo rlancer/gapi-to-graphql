@@ -56,7 +56,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
       return {
         type: new GraphQLObjectType({
-          name: resource,
+          name: `${upperFirst(resource)}Resource`,
           fields
         }),
         resolve: (parent) => parent
