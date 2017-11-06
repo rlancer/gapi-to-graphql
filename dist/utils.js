@@ -23,10 +23,12 @@ var keyMap = function keyMap(literal, valueOperator, keyTransform) {
   if (!literal) return null;
 
   var r = {};
-  keys(literal).forEach(function (key) {
-    var value = valueOperator(key, literal[key]);
 
-    if (value !== null) r[keyTransform ? keyTransform(key) : key] = valueOperator(key, literal[key]);
+  var index = 0;
+  keys(literal).forEach(function (key) {
+    var value = valueOperator(key, literal[key], index++);
+
+    if (value !== null) r[keyTransform ? keyTransform(key) : key] = value;
   });
   return r;
 };

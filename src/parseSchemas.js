@@ -3,6 +3,7 @@ import {upperFirst, keyMap, keys, values} from './utils'
 export default (schemas, graphQLModule) => {
 
 
+  const path = []
   const {GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLInt, GraphQLList, GraphQLEnumType} = graphQLModule
   const types = {}
   const existingNames = {}
@@ -10,7 +11,6 @@ export default (schemas, graphQLModule) => {
 
   // renames kind of sloppy can do something where if a root type exists it say's TasksRoot instead of te second being Tasks2
   const getUniqueName = (name, isRoot) => {
-
 
 
     if (existingNames[name]) {
@@ -27,7 +27,7 @@ export default (schemas, graphQLModule) => {
   // sometimes arrays have anonymous types and need to make sure they have unique names
   const arrayItemTypesCount = {}
 
-  const handleArray = ({typeName, propertyName, propertyDetail}) => {
+  const handleArray = ({typeName, propertyName, propertyDetail, parentPath}) => {
     const {items} = propertyDetail
     const {enum: enumItems, $ref, type, properties} = items
     if (enumItems) {
@@ -55,7 +55,9 @@ export default (schemas, graphQLModule) => {
 
       return new GraphQLList(parseProperties({
         name: `${arrayItemTypeName}`,
-        properties
+        properties,
+        parentPath,
+        fromArray: true
       }))
     }
     else if ($ref) {
@@ -72,73 +74,97 @@ export default (schemas, graphQLModule) => {
 
   }
 
-  const parseProperties = ({name, description, properties}) => {
+  const parseProperties = ({name, description, properties, parentPath = [], fromArray = false}) => {
 
 
-    return new GraphQLObjectType({
-      name: getUniqueName(name),
-      description,
-      fields: () => {
+    //if (name === 'ChannelContentDetails')
+      // console.dir(properties, {depth: 5})
 
-        const rFields = keyMap(properties, (propertyName, propertyDetail) => {
+    parentPath.push({name, properties})
 
+//    console.log(fromArray ? '[]' : '>>' + parentPath.map(p => p.name).join(' / '))
 
-          const {type, description, properties, $ref, format, additionalProperties} = propertyDetail
+    if (parentPath.length > 1) {
+      // console.dir(parentPath,{depth:6})
+    }
 
-          if (additionalProperties && additionalProperties.$ref) {
-            // strange description in YouTube API, ignoring it for now
-            return null
-          }
+    let yy = 0;
+    const fields = (xx) => {
 
-
-          const rType = (() => {
-
-
-            if ($ref) {
-
-              if (!types[$ref])
-                console.log('CAN NOT FIND REF OF TYPE ', $ref, name)
-
-              return types[$ref]
-            }
+      if (yy++ > 0) {
+        console.log('YYYYYYYYY')
+      }
 
 
-            switch (type) {
-              case 'any': // Any type? No idea how to handle this so going to treat it as string
-              case 'string':
-                return GraphQLString
-                break
-              case 'array': {
-                return handleArray({typeName: name, propertyName, propertyDetail})
-              }
-                break
-              case 'object':
-                return parseProperties({name: propertyName, description, propertyDetail})
-                break
-              case 'integer':
-              case 'number':
-                return GraphQLInt
-                break
-              case 'boolean':
-                return GraphQLBoolean
-                break
-              default:
-                return GraphQLString
-            }
-          })()
+      let xxt = 0
+      const rFields = keyMap(properties, (propertyName, propertyDetail) => {
 
-          return {type: rType, description}
 
-        }, (key => key.replace("@", "at_")))
+        const {type, description, properties:props, $ref, format, additionalProperties} = propertyDetail
 
-        if (!rFields) {
+        if (name === 'ChannelContentDetails')
+          console.log('propertyName', propertyName, type, xxt++, properties)
 
-          return {thisTypeHasNoFieldsAndGraphQLDontLikeThat: {type: GraphQLBoolean}}
+        if (additionalProperties && additionalProperties.$ref) {
+          // strange description in YouTube API, ignoring it for now
+          return null
         }
 
-        return rFields
+        const rType = (() => {
+
+          if ($ref) {
+            if (!types[$ref])
+              console.log('CAN NOT FIND REF OF TYPE ', $ref, name)
+
+            return types[$ref]
+          }
+
+          switch (type) {
+            case 'any': // Any type? No idea how to handle this so going to treat it as string
+            case 'string':
+              return GraphQLString
+              break
+            case 'array': {
+              return handleArray({typeName: name, propertyName, propertyDetail, parentPath})
+            }
+              break
+            case 'object':
+              return parseProperties({name: propertyName, description, propertyDetail, parentPath})
+              break
+            case 'integer':
+            case 'number':
+              return GraphQLInt
+              break
+            case 'boolean':
+              return GraphQLBoolean
+              break
+            default:
+              return GraphQLString
+          }
+        })()
+
+        return {type: rType, description}
+
+      }, (key => key.replace("@", "at_")))
+
+      if (!rFields) {
+
+        return {thisTypeHasNoFieldsAndGraphQLDontLikeThat: {type: GraphQLBoolean}}
       }
+
+      return rFields
+    }
+
+
+    // console.log(path.join(' / '))
+    const rObject = new GraphQLObjectType({
+      name: getUniqueName(name),
+      description,
+      fields: () => fields(rObject)
     })
+
+    return rObject
+
   }
 
 
@@ -150,18 +176,18 @@ export default (schemas, graphQLModule) => {
         // console.dir(schema)
         const {id, type, properties, description} = schema
 
-        const uid = getUniqueName(id, true)
 
-        if (types [uid]) {
-          console.warn('Type', id, uid, schema, 'exists')
+        if (types [id]) {
+          console.warn('Type', id, schema, 'exists')
         }
 
+
         if (type === 'object') {
-          types [uid] = parseProperties({name: uid, description, properties})
+          types [id] = parseProperties({name: id, description, properties})
         }
         else if (type === 'array') {
 
-          types [uid] = handleArray({typeName: 'Root', propertyName: uid, propertyDetail: schema})
+          types [id] = handleArray({typeName: 'Root', propertyName: id, propertyDetail: schema})
 
 
         }
