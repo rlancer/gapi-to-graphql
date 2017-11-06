@@ -7,8 +7,6 @@ Object.defineProperty(exports, "__esModule", {
 var _utils = require('./utils');
 
 exports.default = function (schemas, graphQLModule) {
-
-  var path = [];
   var GraphQLObjectType = graphQLModule.GraphQLObjectType,
       GraphQLString = graphQLModule.GraphQLString,
       GraphQLBoolean = graphQLModule.GraphQLBoolean,
@@ -21,7 +19,12 @@ exports.default = function (schemas, graphQLModule) {
   var existingNames = {};
 
   // renames kind of sloppy can do something where if a root type exists it say's TasksRoot instead of te second being Tasks2
-  var getUniqueName = function getUniqueName(name, isRoot) {
+  var getUniqueName = function getUniqueName(_ref) {
+    var name = _ref.name,
+        parentPath = _ref.parentPath;
+
+
+    if (name === 'advertisedGroups') console.log('uname', name, existingNames[name]);
 
     if (existingNames[name]) {
       var incr = ++existingNames[name];
@@ -33,13 +36,11 @@ exports.default = function (schemas, graphQLModule) {
   };
 
   // sometimes arrays have anonymous types and need to make sure they have unique names
-  var arrayItemTypesCount = {};
-
-  var handleArray = function handleArray(_ref) {
-    var typeName = _ref.typeName,
-        propertyName = _ref.propertyName,
-        propertyDetail = _ref.propertyDetail,
-        parentPath = _ref.parentPath;
+  var handleArray = function handleArray(_ref2) {
+    var typeName = _ref2.typeName,
+        propertyName = _ref2.propertyName,
+        propertyDetail = _ref2.propertyDetail,
+        parentPath = _ref2.parentPath;
     var items = propertyDetail.items;
     var enumItems = items.enum,
         $ref = items.$ref,
@@ -54,7 +55,7 @@ exports.default = function (schemas, graphQLModule) {
       });
 
       return new GraphQLEnumType({
-        name: propertyName,
+        name: getUniqueName({ name: propertyName, parentPath: parentPath }),
         values: _values
       });
     } else if (type === 'string' || type === 'any') {
@@ -66,7 +67,7 @@ exports.default = function (schemas, graphQLModule) {
       var arrayItemTypeName = '' + typeName + (0, _utils.upperFirst)(propertyName) + 'Item';
 
       return new GraphQLList(parseProperties({
-        name: '' + arrayItemTypeName,
+        name: arrayItemTypeName,
         properties: properties,
         parentPath: parentPath,
         fromArray: true
@@ -81,14 +82,14 @@ exports.default = function (schemas, graphQLModule) {
     }
   };
 
-  var parseProperties = function parseProperties(_ref2) {
-    var name = _ref2.name,
-        description = _ref2.description,
-        properties = _ref2.properties,
-        _ref2$parentPath = _ref2.parentPath,
-        parentPath = _ref2$parentPath === undefined ? [] : _ref2$parentPath,
-        _ref2$fromArray = _ref2.fromArray,
-        fromArray = _ref2$fromArray === undefined ? false : _ref2$fromArray;
+  var parseProperties = function parseProperties(_ref3) {
+    var name = _ref3.name,
+        description = _ref3.description,
+        properties = _ref3.properties,
+        _ref3$parentPath = _ref3.parentPath,
+        parentPath = _ref3$parentPath === undefined ? [] : _ref3$parentPath,
+        _ref3$fromArray = _ref3.fromArray,
+        fromArray = _ref3$fromArray === undefined ? false : _ref3$fromArray;
 
 
     //if (name === 'ChannelContentDetails')
@@ -98,90 +99,72 @@ exports.default = function (schemas, graphQLModule) {
 
     //    console.log(fromArray ? '[]' : '>>' + parentPath.map(p => p.name).join(' / '))
 
-    if (parentPath.length > 1) {
-      // console.dir(parentPath,{depth:6})
-    }
 
-    var yy = 0;
-    var _fields = function _fields(xx) {
-
-      if (yy++ > 0) {
-        console.log('YYYYYYYYY');
-      }
-
-      var xxt = 0;
-      var rFields = (0, _utils.keyMap)(properties, function (propertyName, propertyDetail) {
-        var type = propertyDetail.type,
-            description = propertyDetail.description,
-            props = propertyDetail.properties,
-            $ref = propertyDetail.$ref,
-            format = propertyDetail.format,
-            additionalProperties = propertyDetail.additionalProperties;
-
-
-        if (name === 'ChannelContentDetails') console.log('propertyName', propertyName, type, xxt++, properties);
-
-        if (additionalProperties && additionalProperties.$ref) {
-          // strange description in YouTube API, ignoring it for now
-          return null;
-        }
-
-        var rType = function () {
-
-          if ($ref) {
-            if (!types[$ref]) console.log('CAN NOT FIND REF OF TYPE ', $ref, name);
-
-            return types[$ref];
-          }
-
-          switch (type) {
-            case 'any': // Any type? No idea how to handle this so going to treat it as string
-            case 'string':
-              return GraphQLString;
-              break;
-            case 'array':
-              {
-                return handleArray({ typeName: name, propertyName: propertyName, propertyDetail: propertyDetail, parentPath: parentPath });
-              }
-              break;
-            case 'object':
-              return parseProperties({ name: propertyName, description: description, propertyDetail: propertyDetail, parentPath: parentPath });
-              break;
-            case 'integer':
-            case 'number':
-              return GraphQLInt;
-              break;
-            case 'boolean':
-              return GraphQLBoolean;
-              break;
-            default:
-              return GraphQLString;
-          }
-        }();
-
-        return { type: rType, description: description };
-      }, function (key) {
-        return key.replace("@", "at_");
-      });
-
-      if (!rFields) {
-
-        return { thisTypeHasNoFieldsAndGraphQLDontLikeThat: { type: GraphQLBoolean } };
-      }
-
-      return rFields;
-    };
-
-    // console.log(path.join(' / '))
-    var rObject = new GraphQLObjectType({
-      name: getUniqueName(name),
+    return new GraphQLObjectType({
+      name: getUniqueName({ name: name, parentPath: parentPath }),
       description: description,
       fields: function fields() {
-        return _fields(rObject);
+
+        var rFields = (0, _utils.keyMap)(properties, function (propertyName, propertyDetail) {
+          var type = propertyDetail.type,
+              description = propertyDetail.description,
+              props = propertyDetail.properties,
+              $ref = propertyDetail.$ref,
+              format = propertyDetail.format,
+              additionalProperties = propertyDetail.additionalProperties;
+
+
+          if (additionalProperties && additionalProperties.$ref) {
+            // strange description in YouTube API, ignoring it for now
+            return null;
+          }
+
+          var rType = function () {
+
+            if ($ref) {
+              if (!types[$ref]) console.log('CAN NOT FIND REF OF TYPE ', $ref, name);
+
+              return types[$ref];
+            }
+
+            switch (type) {
+              case 'any': // Any type? No idea how to handle this so going to treat it as string
+              case 'string':
+                return GraphQLString;
+                break;
+              case 'array':
+                {
+                  return handleArray({ typeName: name, propertyName: propertyName, propertyDetail: propertyDetail, parentPath: parentPath });
+                }
+                break;
+              case 'object':
+                return parseProperties({ name: propertyName, description: description, propertyDetail: propertyDetail, parentPath: parentPath });
+                break;
+              case 'integer':
+              case 'number':
+                return GraphQLInt;
+                break;
+              case 'boolean':
+                return GraphQLBoolean;
+                break;
+              default:
+                return GraphQLString;
+            }
+          }();
+
+          return { type: rType, description: description };
+        }, function (key) {
+          return key.replace("@", "at_");
+        });
+
+        if (!rFields) {
+
+          return { thisTypeHasNoFieldsAndGraphQLDontLikeThat: { type: GraphQLBoolean } };
+        }
+
+        return rFields;
       }
     });
-
-    return rObject;
   };
 
   var start = function start() {

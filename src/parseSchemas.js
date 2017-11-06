@@ -3,15 +3,16 @@ import {upperFirst, keyMap, keys, values} from './utils'
 export default (schemas, graphQLModule) => {
 
 
-  const path = []
   const {GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLInt, GraphQLList, GraphQLEnumType} = graphQLModule
   const types = {}
   const existingNames = {}
 
 
   // renames kind of sloppy can do something where if a root type exists it say's TasksRoot instead of te second being Tasks2
-  const getUniqueName = (name, isRoot) => {
+  const getUniqueName = ({name, parentPath}) => {
 
+    if (name === 'advertisedGroups')
+      console.log('uname', name, existingNames[name])
 
     if (existingNames[name]) {
       const incr = ++existingNames[name]
@@ -25,8 +26,6 @@ export default (schemas, graphQLModule) => {
   }
 
   // sometimes arrays have anonymous types and need to make sure they have unique names
-  const arrayItemTypesCount = {}
-
   const handleArray = ({typeName, propertyName, propertyDetail, parentPath}) => {
     const {items} = propertyDetail
     const {enum: enumItems, $ref, type, properties} = items
@@ -38,7 +37,7 @@ export default (schemas, graphQLModule) => {
       })
 
       return new GraphQLEnumType({
-        name: propertyName,
+        name: getUniqueName({name: propertyName, parentPath}),
         values
       })
     }
@@ -54,7 +53,7 @@ export default (schemas, graphQLModule) => {
       const arrayItemTypeName = `${typeName}${upperFirst(propertyName)}Item`
 
       return new GraphQLList(parseProperties({
-        name: `${arrayItemTypeName}`,
+        name: arrayItemTypeName,
         properties,
         parentPath,
         fromArray: true
@@ -78,92 +77,75 @@ export default (schemas, graphQLModule) => {
 
 
     //if (name === 'ChannelContentDetails')
-      // console.dir(properties, {depth: 5})
+    // console.dir(properties, {depth: 5})
 
     parentPath.push({name, properties})
 
 //    console.log(fromArray ? '[]' : '>>' + parentPath.map(p => p.name).join(' / '))
 
-    if (parentPath.length > 1) {
-      // console.dir(parentPath,{depth:6})
-    }
 
-    let yy = 0;
-    const fields = (xx) => {
+    return new GraphQLObjectType({
+      name: getUniqueName({name, parentPath}),
+      description,
+      fields() {
 
-      if (yy++ > 0) {
-        console.log('YYYYYYYYY')
-      }
+        const rFields = keyMap(properties, (propertyName, propertyDetail) => {
 
 
-      let xxt = 0
-      const rFields = keyMap(properties, (propertyName, propertyDetail) => {
+          const {type, description, properties: props, $ref, format, additionalProperties} = propertyDetail
 
+          if (additionalProperties && additionalProperties.$ref) {
+            // strange description in YouTube API, ignoring it for now
+            return null
+          }
 
-        const {type, description, properties:props, $ref, format, additionalProperties} = propertyDetail
+          const rType = (() => {
 
-        if (name === 'ChannelContentDetails')
-          console.log('propertyName', propertyName, type, xxt++, properties)
+            if ($ref) {
+              if (!types[$ref])
+                console.log('CAN NOT FIND REF OF TYPE ', $ref, name)
 
-        if (additionalProperties && additionalProperties.$ref) {
-          // strange description in YouTube API, ignoring it for now
-          return null
+              return types[$ref]
+            }
+
+            switch (type) {
+              case 'any': // Any type? No idea how to handle this so going to treat it as string
+              case 'string':
+                return GraphQLString
+                break
+              case 'array': {
+                return handleArray({typeName: name, propertyName, propertyDetail, parentPath})
+              }
+                break
+              case 'object':
+                return parseProperties({name: propertyName, description, propertyDetail, parentPath})
+                break
+              case 'integer':
+              case 'number':
+                return GraphQLInt
+                break
+              case 'boolean':
+                return GraphQLBoolean
+                break
+              default:
+                return GraphQLString
+            }
+          })()
+
+          return {type: rType, description}
+
+        }, (key => key.replace("@", "at_")))
+
+        if (!rFields) {
+
+          return {thisTypeHasNoFieldsAndGraphQLDontLikeThat: {type: GraphQLBoolean}}
         }
 
-        const rType = (() => {
-
-          if ($ref) {
-            if (!types[$ref])
-              console.log('CAN NOT FIND REF OF TYPE ', $ref, name)
-
-            return types[$ref]
-          }
-
-          switch (type) {
-            case 'any': // Any type? No idea how to handle this so going to treat it as string
-            case 'string':
-              return GraphQLString
-              break
-            case 'array': {
-              return handleArray({typeName: name, propertyName, propertyDetail, parentPath})
-            }
-              break
-            case 'object':
-              return parseProperties({name: propertyName, description, propertyDetail, parentPath})
-              break
-            case 'integer':
-            case 'number':
-              return GraphQLInt
-              break
-            case 'boolean':
-              return GraphQLBoolean
-              break
-            default:
-              return GraphQLString
-          }
-        })()
-
-        return {type: rType, description}
-
-      }, (key => key.replace("@", "at_")))
-
-      if (!rFields) {
-
-        return {thisTypeHasNoFieldsAndGraphQLDontLikeThat: {type: GraphQLBoolean}}
+        return rFields
       }
 
-      return rFields
-    }
-
-
-    // console.log(path.join(' / '))
-    const rObject = new GraphQLObjectType({
-      name: getUniqueName(name),
-      description,
-      fields: () => fields(rObject)
     })
 
-    return rObject
 
   }
 

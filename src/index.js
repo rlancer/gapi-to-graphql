@@ -56,7 +56,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
       return {
         type: new GraphQLObjectType({
-          name: `${upperFirst(resource)}Resource`,
+          name: `${upperFirst(resource)}_`,
           fields
         }),
         resolve: (parent) => parent
@@ -80,7 +80,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     return {
       [`${(name + upperFirst(version)).replace('.', '').replace(':', '')}`]: {
         type: new GraphQLObjectType({
-          name: upperFirst(name),
+          name: `${upperFirst(name)}Api`,
           description,
           fields
         }),

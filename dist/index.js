@@ -119,7 +119,7 @@ exports.default = function (_ref) {
 
       return {
         type: new GraphQLObjectType({
-          name: (0, _utils.upperFirst)(resource) + 'Resource',
+          name: (0, _utils.upperFirst)(resource) + '_',
           fields: fields
         }),
         resolve: function resolve(parent) {
@@ -148,7 +148,7 @@ exports.default = function (_ref) {
 
     return (0, _defineProperty3.default)({}, '' + (name + (0, _utils.upperFirst)(version)).replace('.', '').replace(':', ''), {
       type: new GraphQLObjectType({
-        name: (0, _utils.upperFirst)(name),
+        name: (0, _utils.upperFirst)(name) + 'Api',
         description: description,
         fields: fields
       }),
