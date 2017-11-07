@@ -6,19 +6,50 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
   const graphQLTypes = parseSchemas(gapiAsJsonSchema.schemas, graphQLModule)
 
-  const {GraphQLString, GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLInt} = graphQLModule
+  const {GraphQLString, GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLInt, GraphQLEnumType} = graphQLModule
 
   // todo take parameters and make sure they match up after santizing name
-  const mapParametersToArguments = (parameters) => {
+
+  const mapParametersToArguments = (parameters, resource) => {
     return keyMap(parameters, (parameter, parameterDetail) => {
-        const {description, required, type} = parameterDetail
+        const {description, required, type, enum: enumDetails, enumDescriptions} = parameterDetail
 
-
-      // console.log(parameterDetail)
 
         const gqlType = (() => {
 
-          switch (type){
+          if (enumDetails) {
+
+            const enumValues = {}
+
+            enumDetails.forEach((enumName, index) => {
+
+              const v = {value: enumName}
+
+              if (enumDescriptions)
+                v.description = enumDescriptions[index]
+
+              let enumKeyVal = enumName.replace(/\s/g, '_').replace(/-/g, '_')
+
+
+              if (!Number.isNaN(+enumName[0])) {
+                enumKeyVal = `_${enumKeyVal}`
+
+              }
+
+              if (enumKeyVal === 'true')
+                enumKeyVal = 'TRUE'
+
+              enumValues[enumKeyVal] = v
+            })
+
+            const enumName = `${upperFirst(parameter.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, ''))}${upperFirst(resource)}EnumParam`
+            return new GraphQLEnumType({
+              name: enumName,
+              values: enumValues
+            });
+          }
+
+          switch (type) {
             case 'string':
               return GraphQLString
             case 'boolean':
@@ -30,46 +61,46 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
           console.log('unknown type', type)
 
           return GraphQLString
-
-      })()
-
-
+        })()
 
         return {type: required ? new GraphQLNonNull(gqlType) : gqlType, description}
       }, key => key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '')
     )
   }
 
-  const mapMethod = (methodName, methodValue) => {
-
-    const {description, parameters, httpMethod, path, request, response, supportsMediaDownload} = methodValue
-
-    if (httpMethod !== 'GET')
-      return null
-
-    return ({
-      type: response ? graphQLTypes[response.$ref] : GraphQLString,
-      description,
-      args: mapParametersToArguments(parameters),
-      resolve: async (parent, args, ctx) => {
-
-        const {rootArgs, rootDefinitions, baseUrl} = parent
-
-
-        return await makeApiRequest({
-          definitions: {...rootDefinitions, ...parameters},
-          args: {...rootArgs, ...args},
-          baseUrl,
-          path,
-          httpMethod
-        })
-      }
-    })
-  }
-
   const mapResources = (resources) => {
 
+
     return keyMap(resources, (resource, resourceDetails) => {
+
+
+
+
+      const mapMethod = (methodName, methodValue) => {
+
+        const {description, parameters, httpMethod, path, request, response, supportsMediaDownload} = methodValue
+
+        if (httpMethod !== 'GET')
+          return null
+
+        return ({
+          type: response ? graphQLTypes[response.$ref] : GraphQLString,
+          description,
+          args: mapParametersToArguments(parameters, resource),
+          resolve: async (parent, args, ctx) => {
+
+            const {rootArgs, rootDefinitions, baseUrl} = parent
+
+            return await makeApiRequest({
+              definitions: {...rootDefinitions, ...parameters},
+              args: {...rootArgs, ...args},
+              baseUrl,
+              path,
+              httpMethod
+            })
+          }
+        })
+      }
 
       const fields = keyMap(resourceDetails.methods, mapMethod)
 
@@ -106,7 +137,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
           description,
           fields
         }),
-        args: mapParametersToArguments(parameters),
+        args: mapParametersToArguments(parameters, 'Root'),
         resolve: (_, args) => ({rootArgs: args, rootDefinitions: parameters, baseUrl})
       }
     }
