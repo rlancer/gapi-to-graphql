@@ -24,8 +24,6 @@ exports.default = function (schemas, graphQLModule) {
         parentPath = _ref.parentPath;
 
 
-    if (name === 'advertisedGroups') console.log('uname', name, existingNames[name]);
-
     if (existingNames[name]) {
       var incr = ++existingNames[name];
       return name + incr;
@@ -188,6 +186,8 @@ exports.default = function (schemas, graphQLModule) {
 
         types[id] = handleArray({ typeName: 'Root', propertyName: id, propertyDetail: schema });
       } else {
+
+        // got one any here
         console.log('non object type \'' + type + '\'!', schema);
       }
     });

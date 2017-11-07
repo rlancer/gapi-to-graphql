@@ -40,7 +40,10 @@ exports.default = function (_ref) {
   var graphQLTypes = (0, _parseSchemas2.default)(gapiAsJsonSchema.schemas, graphQLModule);
 
   var GraphQLString = graphQLModule.GraphQLString,
-      GraphQLObjectType = graphQLModule.GraphQLObjectType;
+      GraphQLObjectType = graphQLModule.GraphQLObjectType,
+      GraphQLNonNull = graphQLModule.GraphQLNonNull,
+      GraphQLBoolean = graphQLModule.GraphQLBoolean,
+      GraphQLInt = graphQLModule.GraphQLInt;
 
   // todo take parameters and make sure they match up after santizing name
 
@@ -50,7 +53,25 @@ exports.default = function (_ref) {
           required = parameterDetail.required,
           type = parameterDetail.type;
 
-      return { type: GraphQLString, description: description };
+      // console.log(parameterDetail)
+
+      var gqlType = function () {
+
+        switch (type) {
+          case 'string':
+            return GraphQLString;
+          case 'boolean':
+            return GraphQLBoolean;
+          case 'integer':
+            return GraphQLInt;
+        }
+
+        console.log('unknown type', type);
+
+        return GraphQLString;
+      }();
+
+      return { type: required ? new GraphQLNonNull(gqlType) : gqlType, description: description };
     }, function (key) {
       return key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '');
     });

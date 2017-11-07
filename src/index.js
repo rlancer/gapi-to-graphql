@@ -6,14 +6,36 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
   const graphQLTypes = parseSchemas(gapiAsJsonSchema.schemas, graphQLModule)
 
-  const {GraphQLString, GraphQLObjectType} = graphQLModule
+  const {GraphQLString, GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLInt} = graphQLModule
 
-
-   // todo take parameters and make sure they match up after santizing name
+  // todo take parameters and make sure they match up after santizing name
   const mapParametersToArguments = (parameters) => {
     return keyMap(parameters, (parameter, parameterDetail) => {
         const {description, required, type} = parameterDetail
-        return {type: GraphQLString, description}
+
+
+      // console.log(parameterDetail)
+
+        const gqlType = (() => {
+
+          switch (type){
+            case 'string':
+              return GraphQLString
+            case 'boolean':
+              return GraphQLBoolean
+            case 'integer':
+              return GraphQLInt
+          }
+
+          console.log('unknown type', type)
+
+          return GraphQLString
+
+      })()
+
+
+
+        return {type: required ? new GraphQLNonNull(gqlType) : gqlType, description}
       }, key => key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '')
     )
   }
@@ -90,8 +112,5 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     }
   }
 
-
   return mapApi(gapiAsJsonSchema)
 }
-
-

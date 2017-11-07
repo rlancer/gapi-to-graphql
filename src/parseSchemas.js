@@ -11,8 +11,6 @@ export default (schemas, graphQLModule) => {
   // renames kind of sloppy can do something where if a root type exists it say's TasksRoot instead of te second being Tasks2
   const getUniqueName = ({name, parentPath}) => {
 
-    if (name === 'advertisedGroups')
-      console.log('uname', name, existingNames[name])
 
     if (existingNames[name]) {
       const incr = ++existingNames[name]
@@ -174,6 +172,8 @@ export default (schemas, graphQLModule) => {
 
         }
         else {
+
+          // got one any here
           console.log(`non object type '${type}'!`, schema,)
         }
 

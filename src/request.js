@@ -9,7 +9,6 @@ export default async ({definitions, args, baseUrl, path, httpMethod}) => {
 
       if (location === 'query')
         params[key] = args[key]
-
     }
   )
 
