@@ -8,7 +8,7 @@ Converts almost any Google Data API to a GraphQL API via the [Google API Discove
 **Limitations** 
 
 * Read only, for now. [ Join the team](https://www.collaborizm.com/project/Skkk3bBA-) to help change that
-* No downloads 
+* No downloads (think Drive documents ... )
 
 
 ## Supports 138 Google APIs!
