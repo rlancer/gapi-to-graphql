@@ -50,8 +50,22 @@ exports.default = function (_ref) {
       GraphQLInt = graphQLModule.GraphQLInt,
       GraphQLEnumType = graphQLModule.GraphQLEnumType;
 
-  // todo take parameters and make sure they match up after santizing name
 
+  var uniqueEnumNames = {};
+
+  var getUniqueEnumName = function getUniqueEnumName(enumName) {
+
+    if (uniqueEnumNames[enumName] === undefined) {
+      uniqueEnumNames[enumName] = 0;
+    } else {
+      uniqueEnumNames[enumName]++;
+    }
+
+    return '' + enumName + (uniqueEnumNames[enumName] > 0 ? uniqueEnumNames[enumName] : '');
+  };
+
+  // todo take parameters and make sure they match up after santizing name
+  // need to dermine if enum is uniquie
   var mapParametersToArguments = function mapParametersToArguments(parameters, resource) {
     return (0, _utils.keyMap)(parameters, function (parameter, parameterDetail) {
       var description = parameterDetail.description,
@@ -86,7 +100,7 @@ exports.default = function (_ref) {
 
           var enumName = '' + (0, _utils.upperFirst)(parameter.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '')) + (0, _utils.upperFirst)(resource) + 'EnumParam';
           return new GraphQLEnumType({
-            name: enumName,
+            name: getUniqueEnumName(enumName),
             values: enumValues
           });
         }
@@ -100,7 +114,7 @@ exports.default = function (_ref) {
             return GraphQLInt;
         }
 
-        console.log('unknown type', type);
+        console.log('Unknown argument type', type);
 
         return GraphQLString;
       }();

@@ -8,8 +8,23 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
   const {GraphQLString, GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLInt, GraphQLEnumType} = graphQLModule
 
-  // todo take parameters and make sure they match up after santizing name
+  const uniqueEnumNames = {}
 
+  const getUniqueEnumName = enumName => {
+
+
+    if (uniqueEnumNames[enumName] === undefined) {
+      uniqueEnumNames[enumName] = 0
+    }
+    else {
+      uniqueEnumNames[enumName]++
+    }
+
+    return `${enumName}${uniqueEnumNames[enumName] > 0 ? uniqueEnumNames[enumName] : ''}`
+  }
+
+  // todo take parameters and make sure they match up after santizing name
+// need to dermine if enum is uniquie
   const mapParametersToArguments = (parameters, resource) => {
     return keyMap(parameters, (parameter, parameterDetail) => {
         const {description, required, type, enum: enumDetails, enumDescriptions} = parameterDetail
@@ -44,7 +59,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
             const enumName = `${upperFirst(parameter.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, ''))}${upperFirst(resource)}EnumParam`
             return new GraphQLEnumType({
-              name: enumName,
+              name: getUniqueEnumName(enumName),
               values: enumValues
             });
           }
@@ -58,7 +73,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
               return GraphQLInt
           }
 
-          console.log('unknown type', type)
+          console.log('Unknown argument type', type)
 
           return GraphQLString
         })()
@@ -72,8 +87,6 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
 
     return keyMap(resources, (resource, resourceDetails) => {
-
-
 
 
       const mapMethod = (methodName, methodValue) => {
