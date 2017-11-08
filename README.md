@@ -1,3 +1,6 @@
+[![npm version](https://badge.fury.io/js/graphql-add-middleware.svg)](https://badge.fury.io/js/graphql-add-middleware)
+[![Collaborizm](https://www.collaborizm.com/GitHubBadge.svg)](https://www.collaborizm.com/project/Skkk3bBA-)
+
 # Gapi to GraphQL 
 
 Converts any Google Data API to a GraphQL API via the [Google API Discovery Service](https://developers.google.com/discovery/)
@@ -57,10 +60,15 @@ console.log('Listing on port ', port)
 ## Examples 
 Using React https://github.com/rlancer/gapi-to-graphql-example-yt-react
 
-## Should this API be exposed to web clients
+## FAQ
+
+**Should this API be exposed to web clients**
 
 Yes, but be sure to add API keys and sanitize other parameters via a middleware solution like https://www.npmjs.com/package/graphql-add-middleware 
 
+**Can I use this in production**
+
+Yes, since all its doing is making API calls it's fairly safe to use in production if your use cases have been well tested in development.  
 
 ## Contributors 
 
