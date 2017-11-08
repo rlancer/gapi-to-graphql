@@ -28,7 +28,7 @@ yarn add gapi-to-graphql
 ``` 
 
 
-## Example 
+## Example on the server
 
 > index.mjs 
 ```javascript
@@ -68,7 +68,7 @@ console.log(`Please open http://localhost:${port}/graphql`)
 
 
 
-### Examples 
+### Client side example using React 
 Using React https://github.com/rlancer/gapi-to-graphql-example-yt-react
 
 ## FAQ
