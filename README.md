@@ -2,9 +2,9 @@
 
 Converts any Google Data API to a GraphQL API via the [Google API Discovery Service](https://developers.google.com/discovery/)
 
-*Limitations* 
+**Limitations** 
 
-* Read only (for now)
+* Read only, for now. [ Join the team](https://www.collaborizm.com/project/Skkk3bBA-) to help change that. 
 * Downloads are not implemented 
 
 
@@ -57,9 +57,10 @@ console.log('Listing on port ', port)
 ## Examples 
 Using React https://github.com/rlancer/gapi-to-graphql-example-yt-react
 
+## Should this API be exposed to web clients
 
+Yes, but be sure to add API keys and sanitize other parameters via a middleware solution like https://www.npmjs.com/package/graphql-add-middleware 
 
- 
 
 ## Contributors 
 
