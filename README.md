@@ -1,4 +1,4 @@
-[![npm version](https://badge.fury.io/js/graphql-add-middleware.svg)](https://badge.fury.io/js/graphql-add-middleware)
+[![npm version](https://badge.fury.io/js/graphql-add-middleware.svg)](https://badge.fury.io/js/gapi-to-graphql)
 [![Collaborizm](https://www.collaborizm.com/GitHubBadge.svg)](https://www.collaborizm.com/project/Skkk3bBA-)
 
 # Gapi to GraphQL 
