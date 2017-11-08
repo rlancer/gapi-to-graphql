@@ -4,6 +4,8 @@ const gapiToGraphL = require('../dist/index')
 const idToFilename = id => `${id.replace(":", "-").replace('.', '~')}.js`
 const gql = require('graphql')
 
+const {GraphQLSchema, GraphQLObjectType} = gql
+
 const downloadAllAPIs = async () => {
 
   try {
@@ -18,6 +20,7 @@ const downloadAllAPIs = async () => {
     const processApis = () => {
       return new Promise((resolve, reject) => {
 
+        let processed = 0
 
         data.items.forEach(async (item, index) => {
           const {name, id, version, discoveryRestUrl} = item
@@ -28,35 +31,46 @@ const downloadAllAPIs = async () => {
               url: discoveryRestUrl
             })
 
-            gapiToGraphL({
-              gapiAsJsonSchema: itemData,
-              graphQLModule: gql
+
+            new gql.GraphQLSchema({
+              query: new GraphQLObjectType({
+                name: 'RootQueryType',
+                fields: gapiToGraphL({
+                  gapiAsJsonSchema: itemData,
+                  graphQLModule: gql
+                })
+              })
             })
 
-            console.log('ushing api', item)
+
             sucsesfulApis.push(item)
 
             const ws = fs.createWriteStream(idToFilename(id))
             ws.write(`module.exports = ${JSON.stringify(itemData)};`)
             ws.end()
 
+            if (++processed === data.items.length)
+              resolve()
 
           } catch (err) {
             console.warn('Error processing ', id, err)
+
+
+            if (++processed === data.items.length)
+              resolve()
           }
           finally {
-            if (index === data.items.length - 1)
-              resolve()
+
           }
         })
       })
     }
 
+    console.log('Processing ...')
     await processApis()
 
-    console.log(sucsesfulApis.length)
-    console.log(sucsesfulApis.length)
-    console.log(sucsesfulApis)
+    console.log('Done!')
+
 
     const wsList = fs.createWriteStream(`_api_list.js`)
     wsList.write(`module.exports = ${JSON.stringify(sucsesfulApis.map(({name, id, version}) => ({
