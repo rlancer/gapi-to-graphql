@@ -75,3 +75,6 @@ Yes, since all its doing is making API calls it's fairly safe to use in producti
 Pull requests welcome!
 Join the [project on Collaborizm](https://www.collaborizm.com/project/Skkk3bBA-)
 
+## License
+
+gapi-to-graphql is MIT licensed.
