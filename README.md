@@ -7,7 +7,7 @@ Converts any Google Data API to a GraphQL API via the [Google API Discovery Serv
 
 **Limitations** 
 
-* Read only, for now. [ Join the team](https://www.collaborizm.com/project/Skkk3bBA-) to help change that. 
+* Read only, for now. [ Join the team](https://www.collaborizm.com/project/Skkk3bBA-) to help change that
 * No downloads 
 
 
