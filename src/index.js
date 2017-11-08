@@ -12,7 +12,6 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
   const getUniqueEnumName = enumName => {
 
-
     if (uniqueEnumNames[enumName] === undefined) {
       uniqueEnumNames[enumName] = 0
     }

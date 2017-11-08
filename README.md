@@ -2,9 +2,15 @@
 
 Converts any Google Data API to a GraphQL API via the [Google API Discovery Service](https://developers.google.com/discovery/)
 
-## Included APIs 
+*Limitations* 
 
-[Included APIs](/docs/GoogleAPIs.md)
+* Read only (for now)
+* Downloads are not implemented 
+
+
+## Supports 138 Google APIs!
+
+[Full list of APIs their `require()` path](/docs/GoogleAPIs.md)
 
 ## Usage
 
@@ -51,10 +57,6 @@ console.log('Listing on port ', port)
 ## Examples 
 Using React https://github.com/rlancer/gapi-to-graphql-example-yt-react
 
-## Limitations 
-
-* Read only (for now)
-* Downloads are not implemented 
 
 
  
