@@ -68,7 +68,7 @@ console.log(`Please open http://localhost:${port}/graphql`)
 
 
 
-### Client side example using React 
+## Client side example using React 
 Using React https://github.com/rlancer/gapi-to-graphql-example-yt-react
 
 ## FAQ
