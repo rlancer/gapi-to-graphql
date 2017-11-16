@@ -129,6 +129,8 @@ exports.default = function (_ref) {
 
     return (0, _utils.keyMap)(resources, function (resource, resourceDetails) {
 
+      console.log('sub resources', resourceDetails.resources);
+
       var mapMethod = function mapMethod(methodName, methodValue) {
         var description = methodValue.description,
             parameters = methodValue.parameters,

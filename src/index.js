@@ -60,7 +60,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
             return new GraphQLEnumType({
               name: getUniqueEnumName(enumName),
               values: enumValues
-            });
+            })
           }
 
           switch (type) {
@@ -85,12 +85,23 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
   const mapResources = (resources) => {
 
 
+
+
+
     return keyMap(resources, (resource, resourceDetails) => {
+
+
+
+
+      console.log('sub resources', resourceDetails.resources)
+
 
 
       const mapMethod = (methodName, methodValue) => {
 
         const {description, parameters, httpMethod, path, request, response, supportsMediaDownload} = methodValue
+
+
 
         if (httpMethod !== 'GET')
           return null
@@ -134,6 +145,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
 
     const {name, id, description, parameters, version, resources, baseUrl, schemas} = apiJson
+
 
     const fields = mapResources(resources)
 
