@@ -66,7 +66,9 @@ console.log(`Please open http://localhost:${port}/graphql`)
 
 > Run  example with `node --experimental-modules index.mjs`
 
-## Live example YouTube Hunt
+## Live example YouTube Hunt (Client and Server)
+
+GitHub: https://github.com/rlancer/yt-gql-example
 
 UI: https://youtube-gql-example.appspot.com/
 
@@ -75,12 +77,6 @@ GraphiQL: https://youtube-gql-example.appspot.com/graphql
 GraphiQL with a query: [URL too long!](https://youtube-gql-example.appspot.com/graphql?query=%7B%0A%20%20youtubeV3(key%3A%20%22nokeyneed%22)%20%7B%0A%20%20%20%20search%20%7B%0A%20%20%20%20%20%20list(q%3A%20%22dogs%22%2C%20part%3A%20%22snippet%22)%20%7B%0A%20%20%20%20%20%20%20%20items%20%7B%0A%20%20%20%20%20%20%20%20%20%20id%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20videoId%0A%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20snippet%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20title%0A%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%0A)
 
 ![youtubehunt](https://user-images.githubusercontent.com/1339007/34919957-f4649db6-f938-11e7-8ef6-b7aa2889dc49.png)
-
-
-
-
-## Client side example using React 
-Using React https://github.com/rlancer/gapi-to-graphql-example-yt-react
 
 ## FAQ
 
