@@ -1,31 +1,31 @@
-import axios from 'axios'
-import {keys} from './utils'
+import axios from "axios";
+import { keys } from "./utils";
 
-export default async ({definitions, args, baseUrl, path, httpMethod}) => {
-
-  const params = {}
+export default async ({ definitions, args, baseUrl, path, httpMethod }) => {
+  const params = {};
   keys(args).forEach(key => {
-      const {type, location} = definitions[key]
+    const { type, location } = definitions[key];
 
-      if (location === 'query')
-        params[key] = args[key]
+    switch (location) {
+      case "query":
+        params[key] = args[key];
+        break;
+      case "path":
+        path = path.replace("{" + key + "}", args[key]);
+        break;
     }
-  )
+  });
 
-  console.log('make api req', path, baseUrl, params)
   try {
-    const {data} = await axios({
+    const { data } = await axios({
       url: path,
       method: httpMethod,
       params,
       baseURL: baseUrl
-    })
-    return data
+    });
+    return data;
+  } catch (err) {
+    console.error(err);
+    throw err.response.data.error.message;
   }
-  catch (err) {
-    console.error(err)
-    throw err.response.data.error.message
-  }
-
-
-}
+};

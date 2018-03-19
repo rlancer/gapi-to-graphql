@@ -1,22 +1,22 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _regenerator = require('babel-runtime/regenerator');
+var _regenerator = require("babel-runtime/regenerator");
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+var _asyncToGenerator2 = require("babel-runtime/helpers/asyncToGenerator");
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-var _axios = require('axios');
+var _axios = require("axios");
 
 var _axios2 = _interopRequireDefault(_axios);
 
-var _utils = require('./utils');
+var _utils = require("./utils");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -42,10 +42,19 @@ exports.default = function () {
                   location = _definitions$key.location;
 
 
-              if (location === 'query') params[key] = args[key];
+              console.log("param parsing", { type: type, location: location });
+
+              switch (location) {
+                case "query":
+                  params[key] = args[key];
+                  break;
+                case "path":
+                  path = path.replace("{" + key + "}", args[key]);
+                  break;
+              }
             });
 
-            console.log('make api req', path, baseUrl, params);
+            console.log("make api req", path, baseUrl, params);
             _context.prev = 3;
             _context.next = 6;
             return (0, _axios2.default)({
@@ -58,17 +67,17 @@ exports.default = function () {
           case 6:
             _ref3 = _context.sent;
             data = _ref3.data;
-            return _context.abrupt('return', data);
+            return _context.abrupt("return", data);
 
           case 11:
             _context.prev = 11;
-            _context.t0 = _context['catch'](3);
+            _context.t0 = _context["catch"](3);
 
             console.error(_context.t0);
             throw _context.t0.response.data.error.message;
 
           case 15:
-          case 'end':
+          case "end":
             return _context.stop();
         }
       }
@@ -80,4 +89,4 @@ exports.default = function () {
   };
 }();
 
-module.exports = exports['default'];
+module.exports = exports["default"];
