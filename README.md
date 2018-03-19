@@ -68,6 +68,8 @@ console.log(`Please open http://localhost:${port}/graphql`)
 
 ## Live example YouTube Hunt (Client and Server)
 
+temporarily down. Going to redploy to Heroku Soon! 
+
 GitHub: https://github.com/rlancer/yt-gql-example
 
 UI: https://youtube-gql-example.appspot.com/
