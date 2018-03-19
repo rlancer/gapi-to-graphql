@@ -42,8 +42,6 @@ exports.default = function () {
                   location = _definitions$key.location;
 
 
-              console.log("param parsing", { type: type, location: location });
-
               switch (location) {
                 case "query":
                   params[key] = args[key];
@@ -54,9 +52,8 @@ exports.default = function () {
               }
             });
 
-            console.log("make api req", path, baseUrl, params);
-            _context.prev = 3;
-            _context.next = 6;
+            _context.prev = 2;
+            _context.next = 5;
             return (0, _axios2.default)({
               url: path,
               method: httpMethod,
@@ -64,24 +61,24 @@ exports.default = function () {
               baseURL: baseUrl
             });
 
-          case 6:
+          case 5:
             _ref3 = _context.sent;
             data = _ref3.data;
             return _context.abrupt("return", data);
 
-          case 11:
-            _context.prev = 11;
-            _context.t0 = _context["catch"](3);
+          case 10:
+            _context.prev = 10;
+            _context.t0 = _context["catch"](2);
 
             console.error(_context.t0);
             throw _context.t0.response.data.error.message;
 
-          case 15:
+          case 14:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, undefined, [[3, 11]]);
+    }, _callee, undefined, [[2, 10]]);
   }));
 
   return function (_x) {
