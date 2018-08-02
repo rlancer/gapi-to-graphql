@@ -17,10 +17,13 @@
   },
   "watch": {
     "build": {
-      "patterns": ["src"]
+      "patterns": [
+        "src"
+      ]
     }
   },
   "dependencies": {
+    "@types/node": "^10.5.5",
     "axios": "^0.17.0",
     "babel-runtime": "^6.26.0"
   },
@@ -50,7 +53,10 @@
         "env",
         {
           "targets": {
-            "browsers": ["last 2 versions", "safari >= 7"]
+            "browsers": [
+              "last 2 versions",
+              "safari >= 7"
+            ]
           }
         }
       ]

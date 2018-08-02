@@ -1,6 +1,6 @@
-const upperFirst = (str) => `${str[0].toUpperCase()}${str.substring(1)}`
+const upperFirst = (str:string) => `${str[0].toUpperCase()}${str.substring(1)}`
 
-const keyMap = (literal, valueOperator, keyTransform) => {
+const keyMap = (literal, valueOperator, keyTransform?) => {
   if (!literal)
     return null
 

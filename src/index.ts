@@ -37,7 +37,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
             enumDetails.forEach((enumName, index) => {
 
-              const v = {value: enumName}
+              const v = {value: enumName, description:null}
 
               if (enumDescriptions)
                 v.description = enumDescriptions[index]
