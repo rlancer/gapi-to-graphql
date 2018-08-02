@@ -1,6 +1,35 @@
 import {upperFirst, keyMap, keys, values} from './utils'
+import {Schema} from "inspector";
 
-export default (schemas, graphQLModule) => {
+interface IParentPathEntry {
+  name
+  properties
+}
+
+interface IParseProperties {
+  name
+  properties?
+  parentPath?: IParentPathEntry[]
+  propertyDetail?
+  description?: string
+  fromArray?: boolean
+}
+
+interface IHandleArrayArgs {
+  typeName
+  propertyName?
+  propertyDetail?
+  parentPath?
+}
+
+interface ISchema {
+  id
+  type
+  properties
+  description
+}
+
+export default (schemas: Map<string, ISchema>, graphQLModule) => {
 
 
   const {GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLSchema, GraphQLInt, GraphQLList, GraphQLEnumType} = graphQLModule
@@ -24,7 +53,7 @@ export default (schemas, graphQLModule) => {
   }
 
   // sometimes arrays have anonymous types and need to make sure they have unique names
-  const handleArray = ({typeName, propertyName, propertyDetail, parentPath}) => {
+  const handleArray = ({typeName, propertyName, propertyDetail, parentPath}: IHandleArrayArgs) => {
     const {items} = propertyDetail
     const {enum: enumItems, $ref, type, properties} = items
     if (enumItems) {
@@ -71,7 +100,7 @@ export default (schemas, graphQLModule) => {
 
   }
 
-  const parseProperties = ({name, description, properties, parentPath = [], fromArray = false}) => {
+  const parseProperties = ({name, description, properties, parentPath = [], fromArray = false}: IParseProperties) => {
 
 
     //if (name === 'ChannelContentDetails')
@@ -151,7 +180,7 @@ export default (schemas, graphQLModule) => {
   const start = () => {
 
 
-    values(schemas).forEach(schema => {
+    values(schemas).forEach((schema) => {
 
         // console.dir(schema)
         const {id, type, properties, description} = schema
