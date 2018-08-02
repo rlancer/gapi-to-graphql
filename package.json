@@ -39,7 +39,9 @@
     "husky": "^0.14.3",
     "lint-staged": "^4.0.4",
     "npm-watch": "^0.2.0",
-    "prettier": "1.6.1"
+    "prettier": "1.6.1",
+    "ts-node": "^7.0.0",
+    "typescript": "^3.0.1"
   },
   "babel": {
     "plugins": [

@@ -1,234 +1,168 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
-
-var _defineProperty3 = _interopRequireDefault(_defineProperty2);
-
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _extends2 = require('babel-runtime/helpers/extends');
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-var _isNan = require('babel-runtime/core-js/number/is-nan');
-
-var _isNan2 = _interopRequireDefault(_isNan);
-
-var _request = require('./request');
-
-var _request2 = _interopRequireDefault(_request);
-
-var _parseSchemas = require('./parseSchemas');
-
-var _parseSchemas2 = _interopRequireDefault(_parseSchemas);
-
-var _utils = require('./utils');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = function (_ref) {
-  var gapiAsJsonSchema = _ref.gapiAsJsonSchema,
-      graphQLModule = _ref.graphQLModule;
-
-
-  var graphQLTypes = (0, _parseSchemas2.default)(gapiAsJsonSchema.schemas, graphQLModule);
-
-  var GraphQLString = graphQLModule.GraphQLString,
-      GraphQLObjectType = graphQLModule.GraphQLObjectType,
-      GraphQLNonNull = graphQLModule.GraphQLNonNull,
-      GraphQLBoolean = graphQLModule.GraphQLBoolean,
-      GraphQLInt = graphQLModule.GraphQLInt,
-      GraphQLEnumType = graphQLModule.GraphQLEnumType;
-
-
-  var uniqueEnumNames = {};
-
-  var getUniqueEnumName = function getUniqueEnumName(enumName) {
-
-    if (uniqueEnumNames[enumName] === undefined) {
-      uniqueEnumNames[enumName] = 0;
-    } else {
-      uniqueEnumNames[enumName]++;
+"use strict";
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
     }
-
-    return '' + enumName + (uniqueEnumNames[enumName] > 0 ? uniqueEnumNames[enumName] : '');
-  };
-
-  // todo take parameters and make sure they match up after santizing name
-  // need to dermine if enum is uniquie
-  var mapParametersToArguments = function mapParametersToArguments(parameters, resource) {
-    return (0, _utils.keyMap)(parameters, function (parameter, parameterDetail) {
-      var description = parameterDetail.description,
-          required = parameterDetail.required,
-          type = parameterDetail.type,
-          enumDetails = parameterDetail.enum,
-          enumDescriptions = parameterDetail.enumDescriptions;
-
-
-      var gqlType = function () {
-
-        if (enumDetails) {
-
-          var enumValues = {};
-
-          enumDetails.forEach(function (enumName, index) {
-
-            var v = { value: enumName };
-
-            if (enumDescriptions) v.description = enumDescriptions[index];
-
-            var enumKeyVal = enumName.replace(/\s/g, '_').replace(/-/g, '_');
-
-            if (!(0, _isNan2.default)(+enumName[0])) {
-              enumKeyVal = '_' + enumKeyVal;
-            }
-
-            if (enumKeyVal === 'true') enumKeyVal = 'TRUE';
-
-            enumValues[enumKeyVal] = v;
-          });
-
-          var enumName = '' + (0, _utils.upperFirst)(parameter.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '')) + (0, _utils.upperFirst)(resource) + 'EnumParam';
-          return new GraphQLEnumType({
-            name: getUniqueEnumName(enumName),
-            values: enumValues
-          });
-        }
-
-        switch (type) {
-          case 'string':
-            return GraphQLString;
-          case 'boolean':
-            return GraphQLBoolean;
-          case 'integer':
-            return GraphQLInt;
-        }
-
-        console.log('Unknown argument type', type);
-
-        return GraphQLString;
-      }();
-
-      return { type: required ? new GraphQLNonNull(gqlType) : gqlType, description: description };
-    }, function (key) {
-      return key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '');
-    });
-  };
-
-  var mapResources = function mapResources(resources) {
-
-    return (0, _utils.keyMap)(resources, function (resource, resourceDetails) {
-
-      var mapMethod = function mapMethod(methodName, methodValue) {
-        var description = methodValue.description,
-            parameters = methodValue.parameters,
-            httpMethod = methodValue.httpMethod,
-            path = methodValue.path,
-            request = methodValue.request,
-            response = methodValue.response,
-            supportsMediaDownload = methodValue.supportsMediaDownload;
-
-
-        if (httpMethod !== 'GET') return null;
-
-        return {
-          type: response ? graphQLTypes[response.$ref] : GraphQLString,
-          description: description,
-          args: mapParametersToArguments(parameters, resource),
-          resolve: function () {
-            var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(parent, args, ctx) {
-              var rootArgs, rootDefinitions, baseUrl;
-              return _regenerator2.default.wrap(function _callee$(_context) {
-                while (1) {
-                  switch (_context.prev = _context.next) {
-                    case 0:
-                      rootArgs = parent.rootArgs, rootDefinitions = parent.rootDefinitions, baseUrl = parent.baseUrl;
-                      _context.next = 3;
-                      return (0, _request2.default)({
-                        definitions: (0, _extends3.default)({}, rootDefinitions, parameters),
-                        args: (0, _extends3.default)({}, rootArgs, args),
-                        baseUrl: baseUrl,
-                        path: path,
-                        httpMethod: httpMethod
-                      });
-
-                    case 3:
-                      return _context.abrupt('return', _context.sent);
-
-                    case 4:
-                    case 'end':
-                      return _context.stop();
-                  }
-                }
-              }, _callee, undefined);
-            }));
-
-            function resolve(_x, _x2, _x3) {
-              return _ref2.apply(this, arguments);
-            }
-
-            return resolve;
-          }()
-        };
-      };
-
-      var fields = (0, _utils.keyMap)(resourceDetails.methods, mapMethod);
-
-      if ((0, _utils.keys)(fields || {}).length === 0) return null;
-
-      return {
-        type: new GraphQLObjectType({
-          name: (0, _utils.upperFirst)(resource) + '_',
-          fields: fields
-        }),
-        resolve: function resolve(parent) {
-          return parent;
-        }
-      };
-    });
-  };
-
-  var mapApi = function mapApi(apiJson) {
-    var name = apiJson.name,
-        id = apiJson.id,
-        description = apiJson.description,
-        parameters = apiJson.parameters,
-        version = apiJson.version,
-        resources = apiJson.resources,
-        baseUrl = apiJson.baseUrl,
-        schemas = apiJson.schemas;
-
-
-    var fields = mapResources(resources);
-
-    if ((0, _utils.keys)(fields).length === 0) {
-      throw 'No fields for API ' + id;
-    }
-
-    return (0, _defineProperty3.default)({}, '' + (name + (0, _utils.upperFirst)(version)).replace('.', '').replace(':', ''), {
-      type: new GraphQLObjectType({
-        name: (0, _utils.upperFirst)(name) + 'Api',
-        description: description,
-        fields: fields
-      }),
-      args: mapParametersToArguments(parameters, 'Root'),
-      resolve: function resolve(_, args) {
-        return { rootArgs: args, rootDefinitions: parameters, baseUrl: baseUrl };
-      }
-    });
-  };
-
-  return mapApi(gapiAsJsonSchema);
+    return t;
 };
-
-module.exports = exports['default'];
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _this = this;
+Object.defineProperty(exports, "__esModule", { value: true });
+var request_1 = __importDefault(require("./request"));
+var parseSchemas_1 = __importDefault(require("./parseSchemas"));
+var utils_1 = require("./utils");
+exports.default = (function (_a) {
+    var gapiAsJsonSchema = _a.gapiAsJsonSchema, graphQLModule = _a.graphQLModule;
+    var graphQLTypes = parseSchemas_1.default(gapiAsJsonSchema.schemas, graphQLModule);
+    var GraphQLString = graphQLModule.GraphQLString, GraphQLObjectType = graphQLModule.GraphQLObjectType, GraphQLNonNull = graphQLModule.GraphQLNonNull, GraphQLBoolean = graphQLModule.GraphQLBoolean, GraphQLInt = graphQLModule.GraphQLInt, GraphQLEnumType = graphQLModule.GraphQLEnumType;
+    var uniqueEnumNames = {};
+    var getUniqueEnumName = function (enumName) {
+        if (uniqueEnumNames[enumName] === undefined) {
+            uniqueEnumNames[enumName] = 0;
+        }
+        else {
+            uniqueEnumNames[enumName]++;
+        }
+        return "" + enumName + (uniqueEnumNames[enumName] > 0 ? uniqueEnumNames[enumName] : '');
+    };
+    // todo take parameters and make sure they match up after santizing name
+    // need to dermine if enum is uniquie
+    var mapParametersToArguments = function (parameters, resource) {
+        return utils_1.keyMap(parameters, function (parameter, parameterDetail) {
+            var description = parameterDetail.description, required = parameterDetail.required, type = parameterDetail.type, enumDetails = parameterDetail.enum, enumDescriptions = parameterDetail.enumDescriptions;
+            var gqlType = (function () {
+                if (enumDetails) {
+                    var enumValues_1 = {};
+                    enumDetails.forEach(function (enumName, index) {
+                        var v = { value: enumName, description: null };
+                        if (enumDescriptions)
+                            v.description = enumDescriptions[index];
+                        var enumKeyVal = enumName.replace(/\s/g, '_').replace(/-/g, '_');
+                        if (!Number.isNaN(+enumName[0])) {
+                            enumKeyVal = "_" + enumKeyVal;
+                        }
+                        if (enumKeyVal === 'true')
+                            enumKeyVal = 'TRUE';
+                        enumValues_1[enumKeyVal] = v;
+                    });
+                    var enumName = "" + utils_1.upperFirst(parameter.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '')) + utils_1.upperFirst(resource) + "EnumParam";
+                    return new GraphQLEnumType({
+                        name: getUniqueEnumName(enumName),
+                        values: enumValues_1
+                    });
+                }
+                switch (type) {
+                    case 'string':
+                        return GraphQLString;
+                    case 'boolean':
+                        return GraphQLBoolean;
+                    case 'integer':
+                        return GraphQLInt;
+                }
+                console.log('Unknown argument type', type);
+                return GraphQLString;
+            })();
+            return { type: required ? new GraphQLNonNull(gqlType) : gqlType, description: description };
+        }, function (key) { return key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, ''); });
+    };
+    var mapResources = function (resources) {
+        return utils_1.keyMap(resources, function (resource, resourceDetails) {
+            var mapMethod = function (methodName, methodValue) {
+                var description = methodValue.description, parameters = methodValue.parameters, httpMethod = methodValue.httpMethod, path = methodValue.path, request = methodValue.request, response = methodValue.response, supportsMediaDownload = methodValue.supportsMediaDownload;
+                if (httpMethod !== 'GET')
+                    return null;
+                return ({
+                    type: response ? graphQLTypes[response.$ref] : GraphQLString,
+                    description: description,
+                    args: mapParametersToArguments(parameters, resource),
+                    resolve: function (parent, args, ctx) { return __awaiter(_this, void 0, void 0, function () {
+                        var rootArgs, rootDefinitions, baseUrl;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    rootArgs = parent.rootArgs, rootDefinitions = parent.rootDefinitions, baseUrl = parent.baseUrl;
+                                    return [4 /*yield*/, request_1.default({
+                                            definitions: __assign({}, rootDefinitions, parameters),
+                                            args: __assign({}, rootArgs, args),
+                                            baseUrl: baseUrl,
+                                            path: path,
+                                            httpMethod: httpMethod
+                                        })];
+                                case 1: return [2 /*return*/, _a.sent()];
+                            }
+                        });
+                    }); }
+                });
+            };
+            var fields = utils_1.keyMap(resourceDetails.methods, mapMethod);
+            if (utils_1.keys(fields || {}).length === 0)
+                return null;
+            return {
+                type: new GraphQLObjectType({
+                    name: utils_1.upperFirst(resource) + "_",
+                    fields: fields
+                }),
+                resolve: function (parent) { return parent; }
+            };
+        });
+    };
+    var mapApi = function (apiJson) {
+        var _a;
+        var name = apiJson.name, id = apiJson.id, description = apiJson.description, parameters = apiJson.parameters, version = apiJson.version, resources = apiJson.resources, baseUrl = apiJson.baseUrl, schemas = apiJson.schemas;
+        var fields = mapResources(resources);
+        if (utils_1.keys(fields).length === 0) {
+            throw "No fields for API " + id;
+        }
+        return _a = {},
+            _a["" + (name + utils_1.upperFirst(version)).replace('.', '').replace(':', '')] = {
+                type: new GraphQLObjectType({
+                    name: utils_1.upperFirst(name) + "Api",
+                    description: description,
+                    fields: fields
+                }),
+                args: mapParametersToArguments(parameters, 'Root'),
+                resolve: function (_, args) { return ({ rootArgs: args, rootDefinitions: parameters, baseUrl: baseUrl }); }
+            },
+            _a;
+    };
+    return mapApi(gapiAsJsonSchema);
+});
