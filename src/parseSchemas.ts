@@ -180,34 +180,34 @@ export default (schemas: Map<string, ISchema>, graphQLModule) => {
   const start = () => {
 
 
-    values(schemas).forEach((schema) => {
+    for (let k in schemas) {
 
-        // console.dir(schema)
-        const {id, type, properties, description} = schema
+      const schema = schemas[k]
 
-
-        if (types [id]) {
-          console.warn('Type', id, schema, 'exists')
-        }
+      // console.dir(schema)
+      const {id, type, properties, description} = schema
 
 
-        if (type === 'object') {
-          types [id] = parseProperties({name: id, description, properties})
-        }
-        else if (type === 'array') {
-
-          types [id] = handleArray({typeName: 'Root', propertyName: id, propertyDetail: schema})
+      if (types [id]) {
+        console.warn('Type', id, schema, 'exists')
+      }
 
 
-        }
-        else {
+      if (type === 'object') {
+        types [id] = parseProperties({name: id, description, properties})
+      }
+      else if (type === 'array') {
 
-          // got one any here
-          console.log(`non object type '${type}'!`, schema,)
-        }
+        types [id] = handleArray({typeName: 'Root', propertyName: id, propertyDetail: schema})
+
 
       }
-    )
+      else {
+
+        // got one any here
+        console.log(`non object type '${type}'!`, schema,)
+      }
+    }
 
     return types
   }
