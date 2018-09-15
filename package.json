@@ -5,12 +5,13 @@
   "version": "1.0.10",
   "description": "Converts any Google Data API to GraphQL",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "https://github.com/rlancer/gapi-to-graphql",
   "email": "files.robert.lancer@gmail.com",
   "scripts": {
     "precommit": "npm run build && lint-staged",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src -d dist",
+    "build": "tsc",
     "prepublishOnly": "npm run build",
     "watch": "npm-watch",
     "dev": "npm-watch"
@@ -23,46 +24,17 @@
     }
   },
   "dependencies": {
-    "@types/node": "^10.5.5",
-    "axios": "^0.17.0",
-    "babel-runtime": "^6.26.0"
+    "@types/axios": "^0.14.0",
+    "@types/node": "^10.9.4",
+    "axios": "^0.18.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-es2015": "6.24.1",
-    "babel-preset-stage-0": "6.24.1",
-    "graphql": "^0.11.7",
+    "graphql": "^14.0.2",
     "husky": "^0.14.3",
-    "lint-staged": "^4.0.4",
-    "npm-watch": "^0.2.0",
-    "prettier": "1.6.1",
-    "ts-node": "^7.0.0",
-    "typescript": "^3.0.1"
-  },
-  "babel": {
-    "plugins": [
-      "transform-runtime",
-      "add-module-exports",
-      "transform-decorators-legacy"
-    ],
-    "presets": [
-      "stage-0",
-      [
-        "env",
-        {
-          "targets": {
-            "browsers": [
-              "last 2 versions",
-              "safari >= 7"
-            ]
-          }
-        }
-      ]
-    ]
+    "lint-staged": "^7.2.2",
+    "prettier": "1.14.2",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.0.3"
   },
   "lint-staged": {
     "/src/**/*.js": [

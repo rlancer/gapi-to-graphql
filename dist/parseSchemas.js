@@ -113,7 +113,8 @@ exports.default = (function (schemas, graphQLModule) {
         });
     };
     var start = function () {
-        utils_1.values(schemas).forEach(function (schema) {
+        for (var k in schemas) {
+            var schema = schemas[k];
             // console.dir(schema)
             var id = schema.id, type = schema.type, properties = schema.properties, description = schema.description;
             if (types[id]) {
@@ -129,8 +130,9 @@ exports.default = (function (schemas, graphQLModule) {
                 // got one any here
                 console.log("non object type '" + type + "'!", schema);
             }
-        });
+        }
         return types;
     };
     return start();
 });
+//# sourceMappingURL=parseSchemas.js.map
