@@ -48,10 +48,9 @@ var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __importDefault(require("axios"));
 var fs_1 = __importDefault(require("fs"));
-var index_1 = __importDefault(require("../index"));
 var path_1 = __importDefault(require("path"));
 var gql = __importStar(require("graphql"));
-var idToFilename = function (id) { return id.replace(":", "-").replace(".", "~") + ".ts"; };
+var idToFilename = function (id) { return id.replace(':', '-').replace('.', '~') + ".ts"; };
 var GraphQLSchema = gql.GraphQLSchema, GraphQLObjectType = gql.GraphQLObjectType;
 var downloadAllAPIs = function () { return __awaiter(_this, void 0, void 0, function () {
     var data_1, sucsesfulApis_1, processApis, wsList, err_1;
@@ -61,7 +60,7 @@ var downloadAllAPIs = function () { return __awaiter(_this, void 0, void 0, func
             case 0:
                 _a.trys.push([0, 3, , 4]);
                 return [4 /*yield*/, axios_1.default({
-                        url: "https://www.googleapis.com/discovery/v1/apis"
+                        url: 'https://www.googleapis.com/discovery/v1/apis'
                     })];
             case 1:
                 data_1 = (_a.sent()).data;
@@ -80,18 +79,28 @@ var downloadAllAPIs = function () { return __awaiter(_this, void 0, void 0, func
                                         _a.trys.push([1, 3, 4, 5]);
                                         return [4 /*yield*/, axios_1.default({
                                                 url: discoveryRestUrl
-                                            })];
+                                            })
+                                            // new gql.GraphQLSchema({
+                                            //   query: new GraphQLObjectType({
+                                            //     name: "RootQueryType",
+                                            //     fields: gapiToGraphL({
+                                            //       gapiAsJsonSchema: itemData,
+                                            //       graphQLModule: gql
+                                            //     })
+                                            //   })
+                                            // });
+                                        ];
                                     case 2:
                                         itemData = (_a.sent()).data;
-                                        new gql.GraphQLSchema({
-                                            query: new GraphQLObjectType({
-                                                name: "RootQueryType",
-                                                fields: index_1.default({
-                                                    gapiAsJsonSchema: itemData,
-                                                    graphQLModule: gql
-                                                })
-                                            })
-                                        });
+                                        // new gql.GraphQLSchema({
+                                        //   query: new GraphQLObjectType({
+                                        //     name: "RootQueryType",
+                                        //     fields: gapiToGraphL({
+                                        //       gapiAsJsonSchema: itemData,
+                                        //       graphQLModule: gql
+                                        //     })
+                                        //   })
+                                        // });
                                         sucsesfulApis_1.push(item);
                                         ws = fs_1.default.createWriteStream(path_1.default.resolve(__dirname, idToFilename(id)));
                                         ws.write("export default " + JSON.stringify(itemData) + ";");
@@ -101,7 +110,7 @@ var downloadAllAPIs = function () { return __awaiter(_this, void 0, void 0, func
                                         return [3 /*break*/, 5];
                                     case 3:
                                         err_2 = _a.sent();
-                                        console.warn("Error processing ", id, err_2);
+                                        console.warn('Error processing ', id, err_2);
                                         if (++processed === data_1.items.length)
                                             resolve();
                                         return [3 /*break*/, 5];
@@ -112,11 +121,11 @@ var downloadAllAPIs = function () { return __awaiter(_this, void 0, void 0, func
                         }); });
                     });
                 };
-                console.log("Processing ...");
+                console.log('Processing ...');
                 return [4 /*yield*/, processApis()];
             case 2:
                 _a.sent();
-                console.log("Done!");
+                console.log('Done!');
                 wsList = fs_1.default.createWriteStream(path_1.default.resolve(__dirname, "_api_list.ts"));
                 wsList.write("export default " + JSON.stringify(sucsesfulApis_1.map(function (_a) {
                     var name = _a.name, id = _a.id, version = _a.version;
@@ -127,10 +136,12 @@ var downloadAllAPIs = function () { return __awaiter(_this, void 0, void 0, func
                     });
                 })) + ";");
                 wsList.end();
-                console.log("Available APIs", sucsesfulApis_1.map(function (_a) {
+                console.log('Available APIs', sucsesfulApis_1
+                    .map(function (_a) {
                     var name = _a.name, id = _a.id, version = _a.version;
                     return "|" + name + " | " + version + " | require('gapi-to-graphql/google_apis/" + idToFilename(id) + "') |";
-                }).join("\n"));
+                })
+                    .join('\n'));
                 return [3 /*break*/, 4];
             case 3:
                 err_1 = _a.sent();

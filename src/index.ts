@@ -105,7 +105,9 @@ export default ({ gapiAsJsonSchema }: IEntryParams) => {
       const mapMethod = (methodName, methodValue) => {
         const { description, parameters, httpMethod, path, request, response, supportsMediaDownload } = methodValue
 
-        if (httpMethod !== 'GET') return null
+        if (httpMethod !== 'GET') {
+          return null
+        }
 
         return {
           type: response ? graphQLTypes[response.$ref] : GraphQLString,
@@ -157,6 +159,7 @@ export default ({ gapiAsJsonSchema }: IEntryParams) => {
     //   })
 
     //    })
+
     console.log('fields ', fields, '${upperFirst(name)}Api')
   }
 
