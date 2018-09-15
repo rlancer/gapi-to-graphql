@@ -18,7 +18,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     else {
       uniqueEnumNames[enumName]++
     }
-
+    
     return `${enumName}${uniqueEnumNames[enumName] > 0 ? uniqueEnumNames[enumName] : ''}`
   }
 
@@ -27,7 +27,6 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
   const mapParametersToArguments = (parameters, resource) => {
     return keyMap(parameters, (parameter, parameterDetail) => {
         const {description, required, type, enum: enumDetails, enumDescriptions} = parameterDetail
-
 
         const gqlType = (() => {
 
@@ -44,10 +43,8 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
               let enumKeyVal = enumName.replace(/\s/g, '_').replace(/-/g, '_')
 
-
               if (!Number.isNaN(+enumName[0])) {
                 enumKeyVal = `_${enumKeyVal}`
-
               }
 
               if (enumKeyVal === 'true')
@@ -84,9 +81,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
 
   const mapResources = (resources) => {
 
-
     return keyMap(resources, (resource, resourceDetails) => {
-
 
       const mapMethod = (methodName, methodValue) => {
 
@@ -129,9 +124,7 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     })
   }
 
-
   const mapApi = (apiJson) => {
-
 
     const {name, id, description, parameters, version, resources, baseUrl, schemas} = apiJson
 
@@ -140,7 +133,6 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
     if (keys(fields).length === 0) {
       throw `No fields for API ${id}`
     }
-
 
     return {
       [`${(name + upperFirst(version)).replace('.', '').replace(':', '')}`]: {

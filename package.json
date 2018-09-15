@@ -6,6 +6,9 @@
   "description": "Converts any Google Data API to GraphQL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
   "repository": "https://github.com/rlancer/gapi-to-graphql",
   "email": "files.robert.lancer@gmail.com",
   "scripts": {
@@ -13,18 +16,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "prepublishOnly": "npm run build",
-    "watch": "npm-watch",
-    "dev": "npm-watch"
-  },
-  "watch": {
-    "build": {
-      "patterns": [
-        "src"
-      ]
-    }
+    "download-apis": "ts-node src/google_apis/_download_all_gapis.ts"
   },
   "dependencies": {
-    "@types/axios": "^0.14.0",
     "@types/node": "^10.9.4",
     "axios": "^0.18.0"
   },

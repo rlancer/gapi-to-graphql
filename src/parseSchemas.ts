@@ -20,7 +20,7 @@ interface IHandleArrayArgs {
   propertyName?
   propertyDetail?
   parentPath?
-}
+} 
 
 interface ISchema {
   id
