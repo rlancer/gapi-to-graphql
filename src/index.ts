@@ -11,7 +11,8 @@ import {
   GraphQLEnumType,
   GraphQLObjectTypeConfig,
   GraphQLFieldConfigMap,
-  GraphQLFieldConfig
+  GraphQLFieldConfig,
+  printSchema
 } from 'graphql'
 
 interface IEntryParams {
@@ -149,10 +150,34 @@ export default ({ gapiAsJsonSchema }: IEntryParams) => {
     if (keys(fields).length === 0) {
       throw `No fields for API ${id}`
     }
-    // fields,
-    // return new GraphQLSchema({
-    //   query: new GraphQLObjectType({
-    //     name: `${upperFirst(name)}Api`,
+
+    const schema = new GraphQLSchema({
+      query: new GraphQLObjectType({
+        name: `${upperFirst(name)}ApiQuery`,
+        fields: {
+          [`${upperFirst(name)}Api`]: {
+            type: new GraphQLObjectType({
+              name: `${upperFirst(name)}ApiRoot`,
+              fields: {
+                root: {
+                  type: new GraphQLObjectType({
+                    name: 'YouTubeAPI',
+                    fields: {
+                      ...fields
+                    }
+                  })
+                },
+                args: mapParametersToArguments(parameters, 'Root')
+              }
+            })
+          }
+        }
+      })
+    })
+
+    return printSchema(schema)
+
+    //     name: ,
     //     // description,
     //     // args: mapParametersToArguments(parameters, "Root"),
     //     // resolve: (_, args) => ({ rootArgs: args, rootDefinitions: parameters, baseUrl })
