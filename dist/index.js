@@ -53,10 +53,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var request_1 = __importDefault(require("./request"));
 var parseSchemas_1 = __importDefault(require("./parseSchemas"));
 var utils_1 = require("./utils");
+var graphql_1 = require("graphql");
 exports.default = (function (_a) {
-    var gapiAsJsonSchema = _a.gapiAsJsonSchema, graphQLModule = _a.graphQLModule;
-    var graphQLTypes = parseSchemas_1.default(gapiAsJsonSchema.schemas, graphQLModule);
-    var GraphQLString = graphQLModule.GraphQLString, GraphQLObjectType = graphQLModule.GraphQLObjectType, GraphQLNonNull = graphQLModule.GraphQLNonNull, GraphQLBoolean = graphQLModule.GraphQLBoolean, GraphQLInt = graphQLModule.GraphQLInt, GraphQLEnumType = graphQLModule.GraphQLEnumType;
+    var gapiAsJsonSchema = _a.gapiAsJsonSchema;
+    var graphQLTypes = parseSchemas_1.default(gapiAsJsonSchema.schemas);
     var uniqueEnumNames = {};
     var getUniqueEnumName = function (enumName) {
         if (uniqueEnumNames[enumName] === undefined) {
@@ -87,25 +87,36 @@ exports.default = (function (_a) {
                             enumKeyVal = 'TRUE';
                         enumValues_1[enumKeyVal] = v;
                     });
-                    var enumName = "" + utils_1.upperFirst(parameter.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '')) + utils_1.upperFirst(resource) + "EnumParam";
-                    return new GraphQLEnumType({
+                    var enumName = "" + utils_1.upperFirst(parameter
+                        .replace('$.', 'dollardot')
+                        .replace(/-/g, '')
+                        .replace(/\./g, '')) + utils_1.upperFirst(resource) + "EnumParam";
+                    return new graphql_1.GraphQLEnumType({
                         name: getUniqueEnumName(enumName),
                         values: enumValues_1
                     });
                 }
                 switch (type) {
                     case 'string':
-                        return GraphQLString;
+                        return graphql_1.GraphQLString;
                     case 'boolean':
-                        return GraphQLBoolean;
+                        return graphql_1.GraphQLBoolean;
                     case 'integer':
-                        return GraphQLInt;
+                        return graphql_1.GraphQLInt;
                 }
                 console.log('Unknown argument type', type);
-                return GraphQLString;
+                return graphql_1.GraphQLString;
             })();
-            return { type: required ? new GraphQLNonNull(gqlType) : gqlType, description: description };
-        }, function (key) { return key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, ''); });
+            return {
+                type: required ? new graphql_1.GraphQLNonNull(gqlType) : gqlType,
+                description: description
+            };
+        }, function (key) {
+            return key
+                .replace('$.', 'dollardot')
+                .replace(/-/g, '')
+                .replace(/\./g, '');
+        });
     };
     var mapResources = function (resources) {
         return utils_1.keyMap(resources, function (resource, resourceDetails) {
@@ -113,8 +124,8 @@ exports.default = (function (_a) {
                 var description = methodValue.description, parameters = methodValue.parameters, httpMethod = methodValue.httpMethod, path = methodValue.path, request = methodValue.request, response = methodValue.response, supportsMediaDownload = methodValue.supportsMediaDownload;
                 if (httpMethod !== 'GET')
                     return null;
-                return ({
-                    type: response ? graphQLTypes[response.$ref] : GraphQLString,
+                return {
+                    type: response ? graphQLTypes[response.$ref] : graphql_1.GraphQLString,
                     description: description,
                     args: mapParametersToArguments(parameters, resource),
                     resolve: function (parent, args, ctx) { return __awaiter(_this, void 0, void 0, function () {
@@ -134,13 +145,13 @@ exports.default = (function (_a) {
                             }
                         });
                     }); }
-                });
+                };
             };
             var fields = utils_1.keyMap(resourceDetails.methods, mapMethod);
             if (utils_1.keys(fields || {}).length === 0)
                 return null;
             return {
-                type: new GraphQLObjectType({
+                type: new graphql_1.GraphQLObjectType({
                     name: utils_1.upperFirst(resource) + "_",
                     fields: fields
                 }),
@@ -149,23 +160,21 @@ exports.default = (function (_a) {
         });
     };
     var mapApi = function (apiJson) {
-        var _a;
         var name = apiJson.name, id = apiJson.id, description = apiJson.description, parameters = apiJson.parameters, version = apiJson.version, resources = apiJson.resources, baseUrl = apiJson.baseUrl, schemas = apiJson.schemas;
         var fields = mapResources(resources);
         if (utils_1.keys(fields).length === 0) {
             throw "No fields for API " + id;
         }
-        return _a = {},
-            _a["" + (name + utils_1.upperFirst(version)).replace('.', '').replace(':', '')] = {
-                type: new GraphQLObjectType({
-                    name: utils_1.upperFirst(name) + "Api",
-                    description: description,
-                    fields: fields
-                }),
-                args: mapParametersToArguments(parameters, 'Root'),
-                resolve: function (_, args) { return ({ rootArgs: args, rootDefinitions: parameters, baseUrl: baseUrl }); }
-            },
-            _a;
+        // fields,
+        // return new GraphQLSchema({
+        //   query: new GraphQLObjectType({
+        //     name: `${upperFirst(name)}Api`,
+        //     // description,
+        //     // args: mapParametersToArguments(parameters, "Root"),
+        //     // resolve: (_, args) => ({ rootArgs: args, rootDefinitions: parameters, baseUrl })
+        //   })
+        //    })
+        console.log('fields ', fields, '${upperFirst(name)}Api');
     };
     return mapApi(gapiAsJsonSchema);
 });

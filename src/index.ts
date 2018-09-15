@@ -1,45 +1,54 @@
 import makeApiRequest from './request'
 import parseSchemas from './parseSchemas'
-import {upperFirst, keyMap, keys, values} from './utils'
+import { upperFirst, keyMap, keys, values } from './utils'
+import {
+  GraphQLSchema,
+  GraphQLString,
+  GraphQLObjectType,
+  GraphQLNonNull,
+  GraphQLBoolean,
+  GraphQLInt,
+  GraphQLEnumType,
+  GraphQLObjectTypeConfig,
+  GraphQLFieldConfigMap,
+  GraphQLFieldConfig
+} from 'graphql'
 
-export default ({gapiAsJsonSchema, graphQLModule}) => {
+interface IEntryParams {
+  gapiAsJsonSchema: any
+}
 
-  const graphQLTypes = parseSchemas(gapiAsJsonSchema.schemas, graphQLModule)
-
-  const {GraphQLString, GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLInt, GraphQLEnumType} = graphQLModule
+export default ({ gapiAsJsonSchema }: IEntryParams) => {
+  const graphQLTypes = parseSchemas(gapiAsJsonSchema.schemas)
 
   const uniqueEnumNames = {}
 
   const getUniqueEnumName = enumName => {
-
     if (uniqueEnumNames[enumName] === undefined) {
       uniqueEnumNames[enumName] = 0
-    }
-    else {
+    } else {
       uniqueEnumNames[enumName]++
     }
-    
+
     return `${enumName}${uniqueEnumNames[enumName] > 0 ? uniqueEnumNames[enumName] : ''}`
   }
 
   // todo take parameters and make sure they match up after santizing name
-// need to dermine if enum is uniquie
+  // need to dermine if enum is uniquie
   const mapParametersToArguments = (parameters, resource) => {
-    return keyMap(parameters, (parameter, parameterDetail) => {
-        const {description, required, type, enum: enumDetails, enumDescriptions} = parameterDetail
+    return keyMap(
+      parameters,
+      (parameter, parameterDetail) => {
+        const { description, required, type, enum: enumDetails, enumDescriptions } = parameterDetail
 
         const gqlType = (() => {
-
           if (enumDetails) {
-
             const enumValues = {}
 
             enumDetails.forEach((enumName, index) => {
+              const v = { value: enumName, description: null }
 
-              const v = {value: enumName, description:null}
-
-              if (enumDescriptions)
-                v.description = enumDescriptions[index]
+              if (enumDescriptions) v.description = enumDescriptions[index]
 
               let enumKeyVal = enumName.replace(/\s/g, '_').replace(/-/g, '_')
 
@@ -47,17 +56,21 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
                 enumKeyVal = `_${enumKeyVal}`
               }
 
-              if (enumKeyVal === 'true')
-                enumKeyVal = 'TRUE'
+              if (enumKeyVal === 'true') enumKeyVal = 'TRUE'
 
               enumValues[enumKeyVal] = v
             })
 
-            const enumName = `${upperFirst(parameter.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, ''))}${upperFirst(resource)}EnumParam`
+            const enumName = `${upperFirst(
+              parameter
+                .replace('$.', 'dollardot')
+                .replace(/-/g, '')
+                .replace(/\./g, '')
+            )}${upperFirst(resource)}EnumParam`
             return new GraphQLEnumType({
               name: getUniqueEnumName(enumName),
               values: enumValues
-            });
+            })
           }
 
           switch (type) {
@@ -74,77 +87,77 @@ export default ({gapiAsJsonSchema, graphQLModule}) => {
           return GraphQLString
         })()
 
-        return {type: required ? new GraphQLNonNull(gqlType) : gqlType, description}
-      }, key => key.replace("$.", 'dollardot').replace(/-/g, '').replace(/\./g, '')
+        return {
+          type: required ? new GraphQLNonNull(gqlType) : gqlType,
+          description
+        }
+      },
+      key =>
+        key
+          .replace('$.', 'dollardot')
+          .replace(/-/g, '')
+          .replace(/\./g, '')
     )
   }
 
-  const mapResources = (resources) => {
-
+  const mapResources = resources => {
     return keyMap(resources, (resource, resourceDetails) => {
-
       const mapMethod = (methodName, methodValue) => {
+        const { description, parameters, httpMethod, path, request, response, supportsMediaDownload } = methodValue
 
-        const {description, parameters, httpMethod, path, request, response, supportsMediaDownload} = methodValue
+        if (httpMethod !== 'GET') return null
 
-        if (httpMethod !== 'GET')
-          return null
-
-        return ({
+        return {
           type: response ? graphQLTypes[response.$ref] : GraphQLString,
           description,
           args: mapParametersToArguments(parameters, resource),
           resolve: async (parent, args, ctx) => {
-
-            const {rootArgs, rootDefinitions, baseUrl} = parent
+            const { rootArgs, rootDefinitions, baseUrl } = parent
 
             return await makeApiRequest({
-              definitions: {...rootDefinitions, ...parameters},
-              args: {...rootArgs, ...args},
+              definitions: { ...rootDefinitions, ...parameters },
+              args: { ...rootArgs, ...args },
               baseUrl,
               path,
               httpMethod
             })
           }
-        })
+        }
       }
 
-      const fields = keyMap(resourceDetails.methods, mapMethod)
+      const fields = keyMap(resourceDetails.methods, mapMethod) as GraphQLFieldConfigMap<any, any>
 
-      if (keys(fields || {}).length === 0)
-        return null
+      if (keys(fields || {}).length === 0) return null
 
       return {
         type: new GraphQLObjectType({
           name: `${upperFirst(resource)}_`,
           fields
         }),
-        resolve: (parent) => parent
+        resolve: parent => parent
       }
     })
   }
 
-  const mapApi = (apiJson) => {
-
-    const {name, id, description, parameters, version, resources, baseUrl, schemas} = apiJson
+  const mapApi = apiJson => {
+    const { name, id, description, parameters, version, resources, baseUrl, schemas } = apiJson
 
     const fields = mapResources(resources)
 
     if (keys(fields).length === 0) {
       throw `No fields for API ${id}`
     }
+    // fields,
+    // return new GraphQLSchema({
+    //   query: new GraphQLObjectType({
+    //     name: `${upperFirst(name)}Api`,
+    //     // description,
+    //     // args: mapParametersToArguments(parameters, "Root"),
+    //     // resolve: (_, args) => ({ rootArgs: args, rootDefinitions: parameters, baseUrl })
+    //   })
 
-    return {
-      [`${(name + upperFirst(version)).replace('.', '').replace(':', '')}`]: {
-        type: new GraphQLObjectType({
-          name: `${upperFirst(name)}Api`,
-          description,
-          fields
-        }),
-        args: mapParametersToArguments(parameters, 'Root'),
-        resolve: (_, args) => ({rootArgs: args, rootDefinitions: parameters, baseUrl})
-      }
-    }
+    //    })
+    console.log('fields ', fields, '${upperFirst(name)}Api')
   }
 
   return mapApi(gapiAsJsonSchema)

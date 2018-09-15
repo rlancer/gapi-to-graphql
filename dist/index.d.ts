@@ -1,16 +1,6 @@
-declare const _default: ({ gapiAsJsonSchema, graphQLModule }: {
+interface IEntryParams {
     gapiAsJsonSchema: any;
-    graphQLModule: any;
-}) => {
-    [x: string]: {
-        type: any;
-        args: {} | null;
-        resolve: (_: any, args: any) => {
-            rootArgs: any;
-            rootDefinitions: any;
-            baseUrl: any;
-        };
-    };
-};
+}
+declare const _default: ({ gapiAsJsonSchema }: IEntryParams) => void;
 export default _default;
 //# sourceMappingURL=index.d.ts.map

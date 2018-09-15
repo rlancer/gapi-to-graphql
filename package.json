@@ -14,11 +14,13 @@
   "scripts": {
     "precommit": "npm run build && lint-staged",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "scratch": "ts-node src/scratch.ts",
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "download-apis": "ts-node src/google_apis/_download_all_gapis.ts"
   },
   "dependencies": {
+    "@types/graphql": "^14.0.0",
     "@types/node": "^10.9.4",
     "axios": "^0.18.0"
   },

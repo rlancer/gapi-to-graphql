@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var utils_1 = require("./utils");
-exports.default = (function (schemas, graphQLModule) {
-    var GraphQLObjectType = graphQLModule.GraphQLObjectType, GraphQLString = graphQLModule.GraphQLString, GraphQLBoolean = graphQLModule.GraphQLBoolean, GraphQLSchema = graphQLModule.GraphQLSchema, GraphQLInt = graphQLModule.GraphQLInt, GraphQLList = graphQLModule.GraphQLList, GraphQLEnumType = graphQLModule.GraphQLEnumType;
+var graphql_1 = require("graphql");
+exports.default = (function (schemas) {
     var types = {};
     var existingNames = {};
     // renames kind of sloppy can do something where if a root type exists it say's TasksRoot instead of te second being Tasks2
@@ -27,20 +27,20 @@ exports.default = (function (schemas, graphQLModule) {
             enumItems.forEach(function (enumItem) {
                 values_1[enumItem] = { value: enumItem };
             });
-            return new GraphQLEnumType({
+            return new graphql_1.GraphQLEnumType({
                 name: getUniqueName({ name: propertyName, parentPath: parentPath }),
                 values: values_1
             });
         }
-        else if (type === 'string' || type === 'any') {
-            return new GraphQLList(GraphQLString);
+        else if (type === "string" || type === "any") {
+            return new graphql_1.GraphQLList(graphql_1.GraphQLString);
         }
-        else if (type === 'integer') {
-            return new GraphQLList(GraphQLInt);
+        else if (type === "integer") {
+            return new graphql_1.GraphQLList(graphql_1.GraphQLInt);
         }
-        else if (type === 'object') {
+        else if (type === "object") {
             var arrayItemTypeName = "" + typeName + utils_1.upperFirst(propertyName) + "Item";
-            return new GraphQLList(parseProperties({
+            return new graphql_1.GraphQLList(parseProperties({
                 name: arrayItemTypeName,
                 properties: properties,
                 parentPath: parentPath,
@@ -48,13 +48,13 @@ exports.default = (function (schemas, graphQLModule) {
             }));
         }
         else if ($ref) {
-            return new GraphQLList(types[$ref]);
+            return new graphql_1.GraphQLList(types[$ref]);
         }
-        else if (type === 'array') {
-            return new GraphQLList(handleArray({ typeName: typeName, propertyDetail: propertyDetail.items }));
+        else if (type === "array") {
+            return new graphql_1.GraphQLList(handleArray({ typeName: typeName, propertyDetail: propertyDetail.items }));
         }
         else {
-            console.log('Unknown response ?', propertyDetail);
+            console.log("Unknown response ?", propertyDetail);
         }
     };
     var parseProperties = function (_a) {
@@ -63,7 +63,7 @@ exports.default = (function (schemas, graphQLModule) {
         var name = _a.name, description = _a.description, properties = _a.properties, _b = _a.parentPath, parentPath = _b === void 0 ? [] : _b, _c = _a.fromArray, fromArray = _c === void 0 ? false : _c;
         parentPath.push({ name: name, properties: properties });
         //    console.log(fromArray ? '[]' : '>>' + parentPath.map(p => p.name).join(' / '))
-        return new GraphQLObjectType({
+        return new graphql_1.GraphQLObjectType({
             name: getUniqueName({ name: name, parentPath: parentPath }),
             description: description,
             fields: function () {
@@ -76,37 +76,37 @@ exports.default = (function (schemas, graphQLModule) {
                     var rType = (function () {
                         if ($ref) {
                             if (!types[$ref])
-                                console.log('CAN NOT FIND REF OF TYPE ', $ref, name);
+                                console.log("CAN NOT FIND REF OF TYPE ", $ref, name);
                             return types[$ref];
                         }
                         switch (type) {
-                            case 'any': // Any type? No idea how to handle this so going to treat it as string
-                            case 'string':
-                                return GraphQLString;
+                            case "any": // Any type? No idea how to handle this so going to treat it as string
+                            case "string":
+                                return graphql_1.GraphQLString;
                                 break;
-                            case 'array':
+                            case "array":
                                 {
                                     return handleArray({ typeName: name, propertyName: propertyName, propertyDetail: propertyDetail, parentPath: parentPath });
                                 }
                                 break;
-                            case 'object':
+                            case "object":
                                 return parseProperties({ name: propertyName, description: description, propertyDetail: propertyDetail, parentPath: parentPath });
                                 break;
-                            case 'integer':
-                            case 'number':
-                                return GraphQLInt;
+                            case "integer":
+                            case "number":
+                                return graphql_1.GraphQLInt;
                                 break;
-                            case 'boolean':
-                                return GraphQLBoolean;
+                            case "boolean":
+                                return graphql_1.GraphQLBoolean;
                                 break;
                             default:
-                                return GraphQLString;
+                                return graphql_1.GraphQLString;
                         }
                     })();
                     return { type: rType, description: description };
                 }, (function (key) { return key.replace("@", "at_"); }));
                 if (!rFields) {
-                    return { thisTypeHasNoFieldsAndGraphQLDontLikeThat: { type: GraphQLBoolean } };
+                    return { thisTypeHasNoFieldsAndGraphQLDontLikeThat: { type: graphql_1.GraphQLBoolean } };
                 }
                 return rFields;
             }
@@ -118,13 +118,13 @@ exports.default = (function (schemas, graphQLModule) {
             // console.dir(schema)
             var id = schema.id, type = schema.type, properties = schema.properties, description = schema.description;
             if (types[id]) {
-                console.warn('Type', id, schema, 'exists');
+                console.warn("Type", id, schema, "exists");
             }
-            if (type === 'object') {
+            if (type === "object") {
                 types[id] = parseProperties({ name: id, description: description, properties: properties });
             }
-            else if (type === 'array') {
-                types[id] = handleArray({ typeName: 'Root', propertyName: id, propertyDetail: schema });
+            else if (type === "array") {
+                types[id] = handleArray({ typeName: "Root", propertyName: id, propertyDetail: schema });
             }
             else {
                 // got one any here
