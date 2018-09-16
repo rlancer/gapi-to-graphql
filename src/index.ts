@@ -151,6 +151,8 @@ export default ({ gapiAsJsonSchema }: IEntryParams) => {
       throw `No fields for API ${id}`
     }
 
+    console.log('ag', mapParametersToArguments(parameters, 'Root'))
+
     const schema = new GraphQLSchema({
       query: new GraphQLObjectType({
         name: `${upperFirst(name)}ApiQuery`,
@@ -162,12 +164,10 @@ export default ({ gapiAsJsonSchema }: IEntryParams) => {
                 root: {
                   type: new GraphQLObjectType({
                     name: 'YouTubeAPI',
-                    fields: {
-                      ...fields
-                    }
-                  })
-                },
-                args: mapParametersToArguments(parameters, 'Root')
+                    fields
+                  }),
+                  args: mapParametersToArguments(parameters, 'Root')
+                }
               }
             })
           }

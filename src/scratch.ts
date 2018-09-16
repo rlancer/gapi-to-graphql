@@ -1,20 +1,8 @@
-import {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLString,
-  printSchema
-} from "graphql";
-console.log("hello");
+// Use any of the APIs included under the google_apis/ folder, or bring your own API descriptor
+import YouTubeAPI from './google_apis/youtube-v3'
+import gapiToGraphQL from './index'
 
-const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: "Query",
-    fields: {
-      hello: {
-        type: GraphQLString
-      }
-    }
-  })
-});
+// need this separate assignment when using nodes experimental modules feature
+const schema = gapiToGraphQL({ gapiAsJsonSchema: YouTubeAPI })
 
-console.log(printSchema(schema));
+console.log(schema)
