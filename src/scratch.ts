@@ -4,5 +4,3 @@ import gapiToGraphQL from './index'
 
 // need this separate assignment when using nodes experimental modules feature
 const schema = gapiToGraphQL({ gapiAsJsonSchema: YouTubeAPI })
-
-console.log(schema)
