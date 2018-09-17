@@ -6,17 +6,26 @@ import { Context } from '.'
 
 const mapApi = (apiJson, context: Context) => {
   const { name, id, description, parameters, version, resources, baseUrl, schemas } = apiJson
-  const { graphQLTypes, resolverMap, queryResolvers } = context
+  const { graphQLTypes, resolverMap } = context
 
-  const fields = mapResources(resources, context)
+  const API_ROOT = `${upperFirst(name)}ApiRootObject`
+
+  const queryTypeName = `${upperFirst(name)}ApiQuery`
+
+  resolverMap[queryTypeName] = { root: parent => parent }
+  resolverMap[`${upperFirst(name)}Api`] = parent => parent
+
+  const apiRootResolvers = {}
+  resolverMap[API_ROOT] = apiRootResolvers
+
+  const fields = mapResources(resources, context.graphQLTypes, apiRootResolvers)
 
   if (keys(fields).length === 0) {
     throw `No fields for API ${id}`
   }
-
   const schema = new GraphQLSchema({
     query: new GraphQLObjectType({
-      name: `${upperFirst(name)}ApiQuery`,
+      name: queryTypeName,
       fields: {
         [`${upperFirst(name)}Api`]: {
           type: new GraphQLObjectType({
@@ -24,7 +33,7 @@ const mapApi = (apiJson, context: Context) => {
             fields: {
               root: {
                 type: new GraphQLObjectType({
-                  name: `${upperFirst(name)}ApiRootObject`,
+                  name: API_ROOT,
                   fields
                 }),
                 args: mapParametersToArguments(parameters, 'Root')
@@ -36,8 +45,6 @@ const mapApi = (apiJson, context: Context) => {
     })
   })
 
-  queryResolvers[`${upperFirst(name)}Api`] = parent => parent
-
-  return { schema: printSchema(schema), resolverMap: { query: queryResolvers } }
+  return { schema: printSchema(schema), resolverMap }
 }
 export { mapApi }

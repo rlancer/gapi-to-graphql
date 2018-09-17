@@ -9,7 +9,6 @@ export interface Context {
   resolverMap
   queryResolvers
   graphQLTypes
-  resoversResources
 }
 
 // structure
@@ -18,11 +17,10 @@ export interface Context {
 export default ({ gapiAsJsonSchema }: IEntryParams) => {
   const queryResolvers = {}
   const resolverMap = {}
-  const resoversResources = {}
 
   const graphQLTypes = parseSchemas(gapiAsJsonSchema.schemas)
 
-  const context = { resolverMap, resoversResources, queryResolvers, graphQLTypes }
+  const context = { resolverMap, queryResolvers, graphQLTypes }
 
   return mapApi(gapiAsJsonSchema, context)
 }

@@ -5,15 +5,12 @@ import makeApiRequest from './request'
 import { Context } from '.'
 import { resolve } from 'url'
 
-const mapResources = (resources, context: Context) => {
-  const { queryResolvers, resoversResources, resolverMap, graphQLTypes } = context
-
+const mapResources = (resources, graphQLTypes, apiRootResolvers) => {
   return keyMap(resources, (resource, resourceDetails) => {
     const resourceName = `${upperFirst(resource)}_`
 
-    resolverMap[resourceName] = {}
-
-    resoversResources[resource] = parent => parent
+    apiRootResolvers[resourceName] = {}
+    // resoversResources[resource] = parent => parent
 
     const mapMethod = (methodName, methodValue) => {
       const { description, parameters, httpMethod, path, request, response, supportsMediaDownload } = methodValue
@@ -22,7 +19,7 @@ const mapResources = (resources, context: Context) => {
         return null
       }
 
-      resolverMap[resourceName][methodName] = async (parent, args, ctx) => {
+      apiRootResolvers[resourceName][methodName] = async (parent, args, ctx) => {
         const { rootArgs, rootDefinitions, baseUrl } = parent
 
         return await makeApiRequest({
@@ -47,7 +44,7 @@ const mapResources = (resources, context: Context) => {
       return null
     }
 
-    resolverMap[resource] = parent => parent
+    apiRootResolvers[resource] = parent => parent
 
     return {
       type: new GraphQLObjectType({
