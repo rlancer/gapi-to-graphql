@@ -6,7 +6,6 @@ import { Context } from '.'
 
 const mapApi = (apiJson, context: Context) => {
   const { name, id, description, parameters, version, resources, baseUrl, schemas } = apiJson
-
   const { graphQLTypes, resolverMap, queryResolvers } = context
 
   const fields = mapResources(resources, context)
