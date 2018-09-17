@@ -8,17 +8,18 @@ const mapApi = (apiJson, context: Context) => {
   const { name, id, description, parameters, version, resources, baseUrl, schemas } = apiJson
   const { graphQLTypes, resolverMap } = context
 
-  const API_ROOT = `${upperFirst(name)}ApiRootObject`
+  const API_ROOT = `${upperFirst(name)}Resources`
 
   const queryTypeName = `${upperFirst(name)}ApiQuery`
 
-  resolverMap[queryTypeName] = { root: parent => parent }
-  resolverMap[`${upperFirst(name)}Api`] = parent => parent
+  resolverMap[queryTypeName] = { [`${upperFirst(name)}Api`]: parent => parent }
 
-  const apiRootResolvers = {}
-  resolverMap[API_ROOT] = apiRootResolvers
+  resolverMap[`${upperFirst(name)}ApiRoot`] = { root: parent => parent }
 
-  const fields = mapResources(resources, context.graphQLTypes, apiRootResolvers)
+  const resourceResolvers = {}
+  resolverMap[API_ROOT] = resourceResolvers
+
+  const fields = mapResources(resources, context.graphQLTypes, resourceResolvers, resolverMap)
 
   if (keys(fields).length === 0) {
     throw `No fields for API ${id}`

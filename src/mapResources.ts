@@ -5,12 +5,9 @@ import makeApiRequest from './request'
 import { Context } from '.'
 import { resolve } from 'url'
 
-const mapResources = (resources, graphQLTypes, apiRootResolvers) => {
+const mapResources = (resources, graphQLTypes, resourceResolvers, resolverMap) => {
   return keyMap(resources, (resource, resourceDetails) => {
     const resourceName = `${upperFirst(resource)}_`
-
-    apiRootResolvers[resourceName] = {}
-    // resoversResources[resource] = parent => parent
 
     const mapMethod = (methodName, methodValue) => {
       const { description, parameters, httpMethod, path, request, response, supportsMediaDownload } = methodValue
@@ -19,7 +16,7 @@ const mapResources = (resources, graphQLTypes, apiRootResolvers) => {
         return null
       }
 
-      apiRootResolvers[resourceName][methodName] = async (parent, args, ctx) => {
+      const resolve = async (parent, args, ctx) => {
         const { rootArgs, rootDefinitions, baseUrl } = parent
 
         return await makeApiRequest({
@@ -30,6 +27,11 @@ const mapResources = (resources, graphQLTypes, apiRootResolvers) => {
           httpMethod
         })
       }
+
+      if (!resolverMap[resourceName]) {
+        resolverMap[resourceName] = {}
+      }
+      resolverMap[resourceName][methodName] = resolve
 
       return {
         type: response ? graphQLTypes[response.$ref] : GraphQLString,
@@ -44,7 +46,7 @@ const mapResources = (resources, graphQLTypes, apiRootResolvers) => {
       return null
     }
 
-    apiRootResolvers[resource] = parent => parent
+    resourceResolvers[resource] = parent => parent
 
     return {
       type: new GraphQLObjectType({
