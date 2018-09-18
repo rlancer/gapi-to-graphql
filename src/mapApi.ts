@@ -6,20 +6,20 @@ import { Context } from '.'
 
 const mapApi = (apiJson, context: Context) => {
   const { name, id, description, parameters, version, resources, baseUrl, schemas } = apiJson
-  const { graphQLTypes, resolverMap } = context
+  const { graphQLTypes, resolvers } = context
 
   const API_ROOT = `${upperFirst(name)}Resources`
 
   const queryTypeName = `${upperFirst(name)}ApiQuery`
 
-  resolverMap[queryTypeName] = { [`${upperFirst(name)}Api`]: parent => parent }
+  resolvers[queryTypeName] = { [`${upperFirst(name)}Api`]: parent => parent }
 
-  resolverMap[`${upperFirst(name)}ApiRoot`] = { root: parent => parent }
+  resolvers[`${upperFirst(name)}ApiRoot`] = { root: parent => parent }
 
   const resourceResolvers = {}
-  resolverMap[API_ROOT] = resourceResolvers
+  resolvers[API_ROOT] = resourceResolvers
 
-  const fields = mapResources(resources, context.graphQLTypes, resourceResolvers, resolverMap)
+  const fields = mapResources(resources, context.graphQLTypes, resourceResolvers, resolvers)
 
   if (keys(fields).length === 0) {
     throw `No fields for API ${id}`
@@ -46,6 +46,6 @@ const mapApi = (apiJson, context: Context) => {
     })
   })
 
-  return { schema: printSchema(schema), resolverMap }
+  return { schema: printSchema(schema), resolvers }
 }
 export { mapApi }
