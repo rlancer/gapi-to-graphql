@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@types/graphql": "^14.0.0",
-    "@types/node": "^10.9.4",
+    "@types/node": "^10.10.1",
     "axios": "^0.18.0"
   },
   "devDependencies": {

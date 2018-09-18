@@ -4,7 +4,7 @@ import gapiToGraphL from '../index'
 import path from 'path'
 import * as gql from 'graphql'
 
-const idToFilename = (id: string) => `${id.replace(':', '-').replace('.', '~')}.ts`
+const idToFilename = (id: string) => `${id.replace(':', '-').replace('.', '~')}.js`
 
 const { GraphQLSchema, GraphQLObjectType } = gql
 
@@ -28,20 +28,10 @@ const downloadAllAPIs = async () => {
               url: discoveryRestUrl
             })
 
-            // new gql.GraphQLSchema({
-            //   query: new GraphQLObjectType({
-            //     name: "RootQueryType",
-            //     fields: gapiToGraphL({
-            //       gapiAsJsonSchema: itemData,
-            //       graphQLModule: gql
-            //     })
-            //   })
-            // });
-
             sucsesfulApis.push(item)
 
-            const ws = fs.createWriteStream(path.resolve(__dirname, idToFilename(id)))
-            ws.write(`export default ${JSON.stringify(itemData)};`)
+            const ws = fs.createWriteStream(path.resolve(__dirname, '../../google_apis', idToFilename(id)))
+            ws.write(`module.exports=${JSON.stringify(itemData)};`)
             ws.end()
 
             if (++processed === data.items.length) resolve()
@@ -60,7 +50,7 @@ const downloadAllAPIs = async () => {
 
     console.log('Done!')
 
-    const wsList = fs.createWriteStream(path.resolve(__dirname, `_api_list.ts`))
+    const wsList = fs.createWriteStream(path.resolve(__dirname, '../../google_apis', `_api_list.js`))
     wsList.write(
       `export default ${JSON.stringify(
         sucsesfulApis.map(({ name, id, version }) => ({
