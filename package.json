@@ -2,7 +2,7 @@
   "name": "gapi-to-graphql",
   "author": "rlancer",
   "license": "MIT",
-  "version": "1.0.10",
+  "version": "2.0.0",
   "description": "Converts any Google Data API to GraphQL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
