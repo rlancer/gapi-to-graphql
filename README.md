@@ -33,9 +33,7 @@ import YouTubeAPI from "gapi-to-graphql/google_apis/youtube-v3";
 const { schema, resolvers } = gapiToGraphQL({ gapiAsJsonSchema: YouTubeAPI });
 
 const server = new ApolloServer({
-  typeDefs: gql`
-    ${schema}
-  `,
+  typeDefs: gql`${schema}`,
   resolvers
 });
 
