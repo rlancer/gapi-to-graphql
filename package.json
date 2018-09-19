@@ -6,9 +6,6 @@
   "description": "Converts any Google Data API to GraphQL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
   "repository": "https://github.com/rlancer/gapi-to-graphql",
   "email": "files.robert.lancer@gmail.com",
   "scripts": {
