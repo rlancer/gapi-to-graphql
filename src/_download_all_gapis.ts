@@ -1,6 +1,6 @@
 import axios from 'axios'
 import fs from 'fs'
-import gapiToGraphL from '../index'
+import gapiToGraphL from './index'
 import path from 'path'
 import * as gql from 'graphql'
 
@@ -28,19 +28,10 @@ const downloadAllAPIs = async () => {
               url: discoveryRestUrl
             })
 
-            // new gql.GraphQLSchema({
-            //   query: new GraphQLObjectType({
-            //     name: "RootQueryType",
-            //     fields: gapiToGraphL({
-            //       gapiAsJsonSchema: itemData,
-            //       graphQLModule: gql
-            //     })
-            //   })
-            // });
 
             sucsesfulApis.push(item)
 
-            const ws = fs.createWriteStream(path.resolve(__dirname, idToFilename(id)))
+            const ws = fs.createWriteStream(path.resolve(__dirname, './google_apis', idToFilename(id)))
             ws.write(`export default ${JSON.stringify(itemData)};`)
             ws.end()
 
@@ -60,7 +51,7 @@ const downloadAllAPIs = async () => {
 
     console.log('Done!')
 
-    const wsList = fs.createWriteStream(path.resolve(__dirname, `_api_list.ts`))
+    const wsList = fs.createWriteStream(path.resolve(__dirname, './google_apis', `_api_list.js`))
     wsList.write(
       `export default ${JSON.stringify(
         sucsesfulApis.map(({ name, id, version }) => ({
