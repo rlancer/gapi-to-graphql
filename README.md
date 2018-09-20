@@ -44,6 +44,33 @@ server.listen({ port: 3031 }).then(({ url }) => {
 
 > Run  example with `node --experimental-modules index.mjs`
 
+## Query usage
+
+```graphql
+{
+  YoutubeApi(key: "YOUR_API_KEY") {
+    search {
+      list(q: "graphql", part: "snippet") {
+        items {
+          id {
+            videoId
+          }
+          snippet {
+            title
+            thumbnails {
+              default {
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+
 ## Live example YouTube Hunt (Client and Server)
 
 temporarily down. Going to redploy to Heroku Soon! 
