@@ -9,7 +9,7 @@
   "repository": "https://github.com/rlancer/gapi-to-graphql",
   "email": "files.robert.lancer@gmail.com",
   "scripts": {
-    "precommit": "npm run build && lint-staged",
+    "precommit": "npm run clean && npm run build && lint-staged",
     "test": "echo \"Error: no test specified\" && exit 1",
     "scratch": "nodemon --exec ts-node src/scratch.ts",
     "build": "tsc",
