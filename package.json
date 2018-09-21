@@ -30,7 +30,7 @@
     "husky": "^0.14.3",
     "lint-staged": "^7.3.0",
     "nodemon": "^1.18.4",
-    "prettier": "1.14.2",
+    "prettier": "^1.14.3",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.3"
   },
