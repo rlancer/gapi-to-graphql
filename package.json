@@ -20,10 +20,12 @@
     "gapi-move": "mv dist/google_apis ."
   },
   "dependencies": {
+    "@types/debug": "0.0.30",
     "@types/graphql": "^14.0.0",
     "@types/node": "^10.10.1",
-    "graphql": "^14.0.2",
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "debug": "^4.0.1",
+    "graphql": "^14.0.2"
   },
   "devDependencies": {
     "apollo-server": "^2.1.0",

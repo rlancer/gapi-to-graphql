@@ -19,8 +19,6 @@ const mapResources = (resources, graphQLTypes, resourceResolvers, resolverMap) =
       const resolve = async (parent, args, ctx) => {
         const { rootArgs, rootDefinitions, baseUrl } = parent
 
-        console.log('resolve', parent, args)
-
         return await makeApiRequest({
           definitions: { ...rootDefinitions, ...parameters },
           args: { ...rootArgs, ...args },
