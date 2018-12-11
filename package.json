@@ -20,21 +20,21 @@
     "gapi-move": "mv dist/google_apis ."
   },
   "dependencies": {
-    "@types/debug": "0.0.30",
-    "@types/graphql": "^14.0.0",
-    "@types/node": "^10.10.1",
     "axios": "^0.18.0",
-    "debug": "^4.0.1",
+    "debug": "^4.1.0",
     "graphql": "^14.0.2"
   },
   "devDependencies": {
-    "apollo-server": "^2.1.0",
-    "husky": "^0.14.3",
-    "lint-staged": "^7.3.0",
-    "nodemon": "^1.18.4",
-    "prettier": "^1.14.3",
+    "@types/debug": "^0.0.31",
+    "@types/graphql": "^14.0.3",
+    "@types/node": "^10.12.12",
+    "apollo-server": "^2.2.6",
+    "husky": "^1.2.0",
+    "lint-staged": "^8.1.0",
+    "nodemon": "^1.18.8",
+    "prettier": "^1.15.3",
     "ts-node": "^7.0.1",
-    "typescript": "^3.0.3"
+    "typescript": "^3.2.2"
   },
   "lint-staged": {
     "/src/**/*.js": [
