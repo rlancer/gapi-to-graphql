@@ -10,6 +10,8 @@ const { GraphQLSchema, GraphQLObjectType } = gql
 
 const downloadAllAPIs = async () => {
   try {
+    const gapisDirPath = path.resolve(__dirname, './google_apis');
+    fs.existsSync(gapisDirPath) || fs.mkdirSync(gapisDirPath);
     const { data } = await axios({
       url: 'https://www.googleapis.com/discovery/v1/apis'
     })
@@ -30,7 +32,6 @@ const downloadAllAPIs = async () => {
 
 
             sucsesfulApis.push(item)
-
             const ws = fs.createWriteStream(path.resolve(__dirname, './google_apis', idToFilename(id)))
             ws.write(`export default ${JSON.stringify(itemData)};`)
             ws.end()
