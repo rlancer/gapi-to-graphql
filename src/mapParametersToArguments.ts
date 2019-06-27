@@ -24,7 +24,7 @@ const mapParametersToArguments = (parameters, resource) => {
             }
 
             if (enumKeyVal === "true") {
-              enumKeyVal = "true";
+              enumKeyVal = "TRUE";
             }
 
             enumValues[enumKeyVal] = v;
