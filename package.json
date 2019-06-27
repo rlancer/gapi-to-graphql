@@ -10,7 +10,7 @@
   "email": "files.robert.lancer@gmail.com",
   "scripts": {
     "precommit": "npm run clean && npm run build && lint-staged",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "scratch": "nodemon --exec ts-node src/scratch.ts",
     "build": "tsc",
     "prepublishOnly": "npm run clean && npm run download-apis && npm run compile-ts && npm run gapi-move",
@@ -38,6 +38,7 @@
     "ts-node": "^8.3.0",
     "typescript": "^3.5.2"
   },
+
   "lint-staged": {
     "/src/**/*.js": [
       "prettier --print-width 150 --no-semi --single-quote --jsx-bracket-same-line --write",
