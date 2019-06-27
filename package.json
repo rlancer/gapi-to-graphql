@@ -18,7 +18,7 @@
     "download-apis": "ts-node src/_download_all_gapis.ts",
     "compile-ts": "tsc",
     "gapi-move": "mv dist/google_apis .",
-    "publish": "npm run np"
+    "np": "np"
   },
   "dependencies": {
     "axios": "^0.19.0",
