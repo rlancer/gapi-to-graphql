@@ -59,6 +59,7 @@ typings/
 # dotenv environment variables file
 .env
 
-
 .idea/
 dist
+
+tsconfig.tsbuildinfo
